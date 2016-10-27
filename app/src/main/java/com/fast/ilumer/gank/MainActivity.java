@@ -9,6 +9,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import com.fast.ilumer.gank.fragment.GankMeiZiFragment;
 import com.fast.ilumer.gank.fragment.GankTypeFragment;
 import com.fast.ilumer.gank.rx.RxBus;
 
@@ -32,14 +33,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        mToolbar.setTitle(R.string.app_name);
+        mViewPager.setAdapter(new ViewPageAdapter(getSupportFragmentManager(),titles,RxBus.getDefault()));
+        mTabLayout.setupWithViewPager(mViewPager);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mToolbar.setTitle(R.string.app_name);
-        mViewPager.setAdapter(new ViewPageAdapter(getSupportFragmentManager(),titles,RxBus.getDefault()));
-        mTabLayout.setupWithViewPager(mViewPager);
     }
 
     @Override
@@ -73,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
                 case 5:
                     return GankTypeFragment.newInstance(titles[5]);
                 case 6:
-                    return GankTypeFragment.newInstance(titles[6]);
+                    return new GankMeiZiFragment();
                 case 7:
                     return GankTypeFragment.newInstance(titles[7]);
                 default:

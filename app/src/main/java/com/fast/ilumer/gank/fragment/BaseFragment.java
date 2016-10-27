@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.fast.ilumer.gank.R;
+import com.fast.ilumer.gank.recyclerview.DividerItemDecoration;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,8 +43,14 @@ public abstract class BaseFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mRefresh.setOnRefreshListener(getRefreshListener());
         mContentRv.setHasFixedSize(true);
-        mContentRv.setLayoutManager(mLayoutManager);
-        mContentRv.setAdapter(mAdapter);
+        mContentRv.setLayoutManager(getLayoutManager());
+        mContentRv.setAdapter(getAdapter());
+        mContentRv.addItemDecoration(new DividerItemDecoration(getActivity(),
+                DividerItemDecoration.VERTICAL_LIST));
+    }
+
+    protected RecyclerView getmContentRv(){
+        return mContentRv;
     }
 
     protected abstract SwipeRefreshLayout.OnRefreshListener getRefreshListener();

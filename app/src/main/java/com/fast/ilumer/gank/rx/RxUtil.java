@@ -8,10 +8,11 @@ import rx.Subscriber;
 
 /**
  * Created by root on 10/15/16.
+ *
  */
 
 public class RxUtil {
-    public static <T> Observable<T> flatResult(final Gank.Result<T> result){
+    public static <T> Observable<T>flatResult(final Gank.Result<T> result){
         return Observable.create(new Observable.OnSubscribe<T>() {
             @Override
             public void call(Subscriber<? super T> subscriber) {

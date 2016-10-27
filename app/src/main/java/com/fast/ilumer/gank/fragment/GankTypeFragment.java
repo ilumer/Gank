@@ -2,10 +2,9 @@ package com.fast.ilumer.gank.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,21 +12,20 @@ import android.view.ViewGroup;
 import com.fast.ilumer.gank.R;
 import com.fast.ilumer.gank.model.GankInfo;
 import com.fast.ilumer.gank.model.InfoAdapter;
-import com.fast.ilumer.gank.network.Gank;
 import com.fast.ilumer.gank.network.RetrofitHelper;
-import com.fast.ilumer.gank.rx.RxUtil;
+import com.fast.ilumer.gank.recyclerview.EndlessRecyclerOnScrollListener;
+import com.fast.ilumer.gank.rx.HandleErrorTransformer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import rx.Observable;
-import rx.Subscriber;
+import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
+import rx.functions.Action0;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -35,14 +33,32 @@ import rx.schedulers.Schedulers;
  *
  */
 
-public class GankTypeFragment extends Fragment {
+public class GankTypeFragment extends BaseFragment {
 
     public static final String TYPE_FLAG = "GankTypeFragment.Type";
-    @BindView(R.id.fragment_recyclerview)
+    //Subscriber实现了Subscription不能够实现复用
+    private Observer<List<GankInfo>> mDataObserver = new Observer<List<GankInfo>>() {
+        @Override
+        public void onCompleted() {
+
+        }
+
+        @Override
+        public void onError(Throwable e) {
+
+        }
+
+        @Override
+        public void onNext(List<GankInfo> infos) {
+            mContentList.addAll(infos);
+            mContentAdapter.notifyDataSetChanged();
+        }
+    };
     RecyclerView mContentRv;
     List<GankInfo> mContentList = new ArrayList<>();
     InfoAdapter mContentAdapter;
-    LinearLayoutManager mLayoutManager;
+    LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+    boolean mIsLoading = false;
     Subscription mSubscription;
     Unbinder unbinder;
     String type;
@@ -66,38 +82,47 @@ public class GankTypeFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mContentRv.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        mContentRv.setLayoutManager(mLayoutManager);
-        mContentAdapter = new InfoAdapter(mContentList);
-        mContentRv.setAdapter(mContentAdapter);
+        mContentRv = getmContentRv();
+        mContentRv.addOnScrollListener(new EndlessRecyclerOnScrollListener(getLayoutManager()) {
+            @Override
+            public void onLoadMore(int current_page) {
+                if (!mIsLoading) {
+                    mSubscription = RetrofitHelper.getInstance()
+                            .getGankDaily().GankTypeInfo(type, number, current_page)
+                            .compose(new HandleErrorTransformer())
+                            .subscribeOn(Schedulers.io())
+                            .doOnSubscribe(new Action0() {
+                                @Override
+                                public void call() {
+                                    mContentAdapter.startLoadingMore();
+                                }
+                            })
+                            .subscribeOn(AndroidSchedulers.mainThread())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Action1<List<GankInfo>>() {
+                                @Override
+                                public void call(List<GankInfo> infos) {
+                                    mContentAdapter.endLoadingMore();
+                                    mContentList.addAll(infos);
+                                    mContentAdapter.notifyDataSetChanged();
+                                    mIsLoading = false;
+                                }
+                            }, new Action1<Throwable>() {
+                                @Override
+                                public void call(Throwable throwable) {
+                                    mContentAdapter.endLoadingMore();
+                                    mIsLoading = false;
+                                }
+                            });
+                }
+            }
+        });
         mSubscription = RetrofitHelper.getInstance()
                 .getGankDaily().GankTypeInfo(type,number,page)
-                .flatMap(new Func1<Gank.Result<List<GankInfo>>, Observable<List<GankInfo>>>() {
-                    @Override
-                    public Observable<List<GankInfo>> call(Gank.Result<List<GankInfo>> listResult) {
-                        return RxUtil.flatResult(listResult);
-                    }
-                })
+                .compose(new HandleErrorTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<GankInfo>>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("tag","error");
-                    }
-
-                    @Override
-                    public void onNext(List<GankInfo> infos) {
-                        mContentList.addAll(infos);
-                        mContentAdapter.notifyDataSetChanged();
-                    }
-                });
+                .subscribe(mDataObserver);
     }
 
 
@@ -118,5 +143,41 @@ public class GankTypeFragment extends Fragment {
         return frgment;
     }
 
+    @Override
+    protected SwipeRefreshLayout.OnRefreshListener getRefreshListener() {
+        return new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (!mIsLoading){
+                    mSubscription = RetrofitHelper.getInstance()
+                            .getGankDaily().GankTypeInfo(type,number,page)
+                            .compose(new HandleErrorTransformer())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Action1<List<GankInfo>>() {
+                                @Override
+                                public void call(List<GankInfo> infos) {
+                                    mContentList.clear();
+                                    mContentList.addAll(infos);
+                                    //是否可以直接替换刷新的数据
+                                    mRefresh.setRefreshing(false);
+                                }
+                            });
+                }
+            }
 
+
+        };
+    }
+
+    @Override
+    protected LinearLayoutManager getLayoutManager() {
+        return mLayoutManager;
+    }
+
+    @Override
+    protected RecyclerView.Adapter<? extends RecyclerView.ViewHolder> getAdapter() {
+        mContentAdapter = new InfoAdapter(mContentList,getActivity());
+        return mContentAdapter;
+    }
 }
