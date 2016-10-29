@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import com.fast.ilumer.gank.R;
 
+import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -15,24 +16,24 @@ import butterknife.ButterKnife;
  */
 
 public class InfoHolder extends RecyclerView.ViewHolder {
-    @BindView(R.id.desc)
-    TextView mDesc;
     @BindView(R.id.recommender)
-    TextView mRecommender;
-    @BindView(R.id.tag)
-    TextView mTag;
+    protected TextView mRecommender;
+    @BindView(R.id.description)
+    protected TextView mDesc;
+    @BindString(R.string.none)
+    protected String none;
     public InfoHolder(View itemView) {
         super(itemView);
         ButterKnife.bind(this,itemView);
     }
 
-    public void BindModel(GankInfo item, boolean Istag){
-        if (Istag) {
-            mTag.setVisibility(View.VISIBLE);
-            mTag.setText(item.getType());
+    public void BindModel(GankInfo item){
+        if (item.getWho()==null){
+            mRecommender.setText(none);
+        }else {
+            mRecommender.setText(item.getWho());
         }
         mDesc.setText(item.getDesc());
-        mRecommender.setText(item.getWho());
     }
 
 }

@@ -14,19 +14,21 @@ public class PictureActivity extends AppCompatActivity {
 
     @BindView(R.id.gril)
     ImageView gril;
+    String uri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture);
         ButterKnife.bind(this);
+        uri = getIntent().getStringExtra("uri");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         Glide.with(this)
-                .load("http://ww2.sinaimg.cn/large/610dc034jw1f91ypzqaivj20u00k0jui.jpg")
+                .load(uri)
                 .centerCrop()
                 .into(gril);
     }

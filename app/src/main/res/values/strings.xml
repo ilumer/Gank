@@ -13,4 +13,5 @@
     </string-array>
 
     <string name="gril">妹子</string>
+    <string name="none">null</string>
 </resources>

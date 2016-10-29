@@ -38,7 +38,7 @@ public class ImageAdapter extends ProgressAdapter{
     }
 
     @Override
-    void BindInfoViewHolder(GankInfo info, RecyclerView.ViewHolder holder) {
+    void BindInfoViewHolder(final GankInfo info, RecyclerView.ViewHolder holder) {
         Glide.with(host)
                 .load(info.getUrl())
                 .centerCrop()
@@ -49,6 +49,7 @@ public class ImageAdapter extends ProgressAdapter{
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(host.getActivity(), PictureActivity.class);
+                i.putExtra("uri",info.getUrl());
                 host.getActivity().startActivity(i);
             }
         });

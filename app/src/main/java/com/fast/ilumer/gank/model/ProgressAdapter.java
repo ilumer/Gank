@@ -1,6 +1,7 @@
 package com.fast.ilumer.gank.model;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +13,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.Observer;
 import rx.functions.Action0;
-import rx.functions.Action1;
 
 /**
  * Created by root on 10/22/16.
@@ -21,7 +22,7 @@ import rx.functions.Action1;
  */
 
 public abstract class ProgressAdapter extends
-        RecyclerView.Adapter<RecyclerView.ViewHolder> implements Action0,Action1<List<GankInfo>> {
+        RecyclerView.Adapter<RecyclerView.ViewHolder> implements Action0, Observer<List<GankInfo>>{
 
     public static final int VIEW_TYPE_LOADING = 0;
     public static final int VIEW_TYPE_INFO =1;
@@ -37,6 +38,7 @@ public abstract class ProgressAdapter extends
         if (isLoadingMore) return;
         isLoadingMore = true;
         notifyItemInserted(getDataCount());
+        Log.e("start loading","start loading");
     }
 
 
@@ -47,12 +49,26 @@ public abstract class ProgressAdapter extends
     }
 
     @Override
-    public void call() {
+    public void call()  {
         startLoadingMore();
     }
 
     @Override
-    public void call(List<GankInfo> infos) {
+    public void onCompleted() {
+
+    }
+
+    @Override
+    public void onError(Throwable e) {
+        //处理可能遇到的问题
+    }
+
+    @Override
+    public void onNext(List<GankInfo> infos) {
+        //下拉刷新在这种情况下只有两种可能
+        //到到的消息中全部已经获取了
+        //部分获取
+        //全部获取 分页的问题产生的问题
         mContentList.addAll(infos);
         this.notifyDataSetChanged();
         endLoadingMore();

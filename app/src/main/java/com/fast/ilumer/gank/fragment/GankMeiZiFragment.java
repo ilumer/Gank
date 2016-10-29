@@ -13,7 +13,6 @@ import com.fast.ilumer.gank.R;
 import com.fast.ilumer.gank.model.GankInfo;
 import com.fast.ilumer.gank.model.GankType;
 import com.fast.ilumer.gank.model.ImageAdapter;
-import com.fast.ilumer.gank.network.Gank;
 import com.fast.ilumer.gank.network.RetrofitHelper;
 import com.fast.ilumer.gank.recyclerview.EndlessRecyclerOnScrollListener;
 import com.fast.ilumer.gank.rx.HandleErrorTransformer;
@@ -26,7 +25,6 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 import rx.subscriptions.CompositeSubscription;
@@ -42,6 +40,7 @@ public class GankMeiZiFragment extends Fragment {
     @BindView(R.id.content)
     RecyclerView content;
     List<GankInfo> mContentList = new ArrayList<>();
+    int number =10;
     ImageAdapter adapter;
     GridLayoutManager manager ;
     CompositeSubscription subscription;
@@ -85,23 +84,17 @@ public class GankMeiZiFragment extends Fragment {
         });
         content.setLayoutManager(manager);
         content.setAdapter(adapter);
-        subscription.add(RetrofitHelper.getInstance()
-                .getGankDaily()
-                .GankTypeInfo("福利",10,1)
-                .compose(new HandleErrorTransformer())
-                .subscribeOn(Schedulers.io())
+        subscription.add(getReslut(1)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(adapter));
         content.addOnScrollListener(new EndlessRecyclerOnScrollListener(manager) {
             @Override
             public void onLoadMore(int page) {
-                subscription.add(subject.flatMap(infoGet)
-                        .compose(new HandleErrorTransformer())
-                        .subscribeOn(Schedulers.io())
+                getReslut(page)
                         .doOnSubscribe(adapter)
                         .subscribeOn(AndroidSchedulers.mainThread())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(adapter));
+                        .subscribe(adapter);
             }
         });
     }
@@ -110,15 +103,13 @@ public class GankMeiZiFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        subscription.clear();
     }
 
-    private final Func1<GankType,Observable<Gank.Result<List<GankInfo>>>> infoGet =
-            new Func1<GankType , Observable<Gank.Result<List<GankInfo>>>>() {
-        @Override
-        public Observable<Gank.Result<List<GankInfo>>> call(GankType model) {
-            return RetrofitHelper.getInstance().getGankDaily()
-                    .GankTypeInfo(model.getType(),model.getNumber(),model.getPage())
-                    .subscribeOn(Schedulers.io());
-        }
-    };
+     private Observable<List<GankInfo>> getReslut(int page){
+        return RetrofitHelper.getInstance().getGankDaily()
+                .GankTypeInfo("福利",number,page)
+                .compose(new HandleErrorTransformer())
+                .subscribeOn(Schedulers.io());
+    }
 }

@@ -34,7 +34,7 @@ public class GankDailyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         switch (viewType){
             case TYPE_COMMON_NEWS:
             case TYPE_COMMON_TITLE_NEWS:{
-                return new InfoHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.gankdaily_newsitem,parent,false));
+                return new InfoHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.ganktypeinfo_item,parent,false));
             }
             case TYPE_IMAGE:{
                 return new PhotosViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.gankdaily_photoitem,parent,false));
@@ -49,13 +49,13 @@ public class GankDailyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         switch (getItemViewType(position)){
             case TYPE_COMMON_NEWS:{
                 if (holder instanceof InfoHolder){
-                    ((InfoHolder) holder).BindModel(item,false);
+                    ((InfoHolder) holder).BindModel(item);
                 }
                 break;
             }
             case TYPE_COMMON_TITLE_NEWS:{
                 if (holder instanceof InfoHolder){
-                    ((InfoHolder) holder).BindModel(item,true);
+                    ((InfoHolder) holder).BindModel(item);
                 }
                 break;
             }
