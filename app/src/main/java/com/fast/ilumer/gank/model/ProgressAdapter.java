@@ -65,12 +65,9 @@ public abstract class ProgressAdapter extends
 
     @Override
     public void onNext(List<GankInfo> infos) {
-        //下拉刷新在这种情况下只有两种可能
-        //到到的消息中全部已经获取了
-        //部分获取
-        //全部获取 分页的问题产生的问题
+        int position = getItemCount();
         mContentList.addAll(infos);
-        this.notifyDataSetChanged();
+        this.notifyItemRangeInserted(position,infos.size());
         endLoadingMore();
     }
 

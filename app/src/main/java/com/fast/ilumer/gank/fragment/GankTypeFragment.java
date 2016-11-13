@@ -1,5 +1,6 @@
 package com.fast.ilumer.gank.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.fast.ilumer.gank.MainActivity;
 import com.fast.ilumer.gank.R;
 import com.fast.ilumer.gank.model.GankInfo;
 import com.fast.ilumer.gank.model.InfoAdapter;
@@ -17,6 +19,7 @@ import com.fast.ilumer.gank.network.RetrofitHelper;
 import com.fast.ilumer.gank.recyclerview.DividerItemDecoration;
 import com.fast.ilumer.gank.recyclerview.EndlessRecyclerOnScrollListener;
 import com.fast.ilumer.gank.rx.HandleErrorTransformer;
+import com.squareup.sqlbrite.BriteDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +28,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import rx.Observable;
+import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
@@ -34,9 +38,12 @@ import rx.subscriptions.CompositeSubscription;
  *
  */
 
-public class GankTypeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
+public class GankTypeFragment extends Fragment
+        implements SwipeRefreshLayout.OnRefreshListener{
 
     public static final String TYPE_FLAG = "GankTypeFragment.Type";
+    private BriteDatabase db;
+
     @BindView(R.id.fragment_recyclerview)
     RecyclerView mContentRv;
     @BindView(R.id.swipe_refresh)
@@ -56,6 +63,14 @@ public class GankTypeFragment extends Fragment implements SwipeRefreshLayout.OnR
         View view = inflater.inflate(R.layout.base_fragment,container,false);
         unbinder = ButterKnife.bind(this,view);
         return view;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof MainActivity){
+            db = ((MainActivity) context).getBrite();
+        }
     }
 
     @Override
@@ -83,20 +98,8 @@ public class GankTypeFragment extends Fragment implements SwipeRefreshLayout.OnR
                         .subscribe(mContentAdapter));
             }
         });
-        mContentAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onChanged() {
-                super.onChanged();
-                mSwipeRefreshLayout.setRefreshing(false);
-            }
-        });
+        mSwipeRefreshLayout.setOnRefreshListener(this);
         onRefresh();
-        mSubscription.add(
-                RetrofitHelper.getInstance().getGankDaily().GankTypeInfo(type,number,page)
-                .compose(new HandleErrorTransformer())
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(mContentAdapter));
     }
 
 
@@ -123,7 +126,37 @@ public class GankTypeFragment extends Fragment implements SwipeRefreshLayout.OnR
         mSwipeRefreshLayout.setRefreshing(true);
         mSubscription.add(getResult(1)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(mContentAdapter));
+                .subscribe(new Observer<List<GankInfo>>() {
+                    @Override
+                    public void onCompleted() {
+                        mSwipeRefreshLayout.setRefreshing(false);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(List<GankInfo> infos) {
+                        if (mContentList.size()==0){
+                            mContentList.addAll(infos);
+                            mContentAdapter.notifyItemRangeChanged(0,infos.size());
+                        }else {
+                            //判断这个时候的数据
+                            GankInfo info = mContentList.get(0);
+                            int index = infos.indexOf(info);
+                            if (index==0){
+                                return;
+                            }else if (index<number&&index>0){
+                                mContentList.addAll(infos.subList(0,index));
+                                mContentAdapter.notifyItemRangeInserted(0,index+1);
+                            }else if (index==-1){
+                                //暂时没有实现缓存所以暂时不会出现这个问题
+                            }
+                        }
+                    }
+                }));
 
     }
     public Observable<List<GankInfo>> getResult(int page){

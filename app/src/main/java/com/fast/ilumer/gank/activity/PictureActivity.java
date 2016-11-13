@@ -2,6 +2,7 @@ package com.fast.ilumer.gank.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -14,6 +15,8 @@ public class PictureActivity extends AppCompatActivity {
 
     @BindView(R.id.gril)
     ImageView gril;
+    @BindView(R.id.toolbar)
+    Toolbar mtoolbar;
     String uri;
 
     @Override
@@ -21,7 +24,9 @@ public class PictureActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture);
         ButterKnife.bind(this);
+        setSupportActionBar(mtoolbar);
         uri = getIntent().getStringExtra("uri");
+        mtoolbar.setTitle("PictureActivity");
     }
 
     @Override

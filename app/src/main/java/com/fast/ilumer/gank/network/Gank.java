@@ -21,7 +21,7 @@ public interface Gank {
     @GET("data/{type}/{number}/{page}")
     Observable<Result<List<GankInfo>>> GankTypeInfo(@Path("type") String type, @Path("number") int number, @Path("page") int page);
 
-    public class Result<T>{
+    class Result<T>{
         public boolean error;
         public T results;
         //Gson解析时对象的命名需要相同

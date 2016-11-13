@@ -7,6 +7,16 @@ import java.util.Date;
  */
 
 public class GankInfo {
+    public static final String TABLE= "gank";
+    public static final String ID = "_id";
+    public static final String CREATEDAT = "createdAt";
+    public static final String PUBLISHEDAT = "publishedAt";
+    public static final String URL = "url";
+    public static final String WHO = "who";
+    public static final String DESC = "desc";
+    public static final String TYPE = "type";
+    public static final String USED = "used";
+
     private String _id;
     private String url;
     private Date publishedAt;
@@ -81,4 +91,15 @@ public class GankInfo {
         this._id = _id;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        boolean result = false;
+        if (obj instanceof GankInfo){
+            GankInfo temp = (GankInfo)obj;
+            result = (this.get_id().equals(temp.get_id()));
+        }
+        return result;
+    }
+
+    //没有重载hashcode;
 }

@@ -3,6 +3,7 @@ package com.fast.ilumer.gank.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -24,6 +25,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import rx.Observable;
+import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
@@ -34,11 +36,14 @@ import rx.subscriptions.CompositeSubscription;
  *
  */
 
-public class GankMeiZiFragment extends Fragment {
+public class GankMeiZiFragment extends Fragment
+        implements SwipeRefreshLayout.OnRefreshListener{
 
     private Unbinder unbinder;
     @BindView(R.id.content)
     RecyclerView content;
+    @BindView(R.id.swipe_refresh)
+    SwipeRefreshLayout mSwipeRefreshLayout;
     List<GankInfo> mContentList = new ArrayList<>();
     int number =10;
     ImageAdapter adapter;
@@ -65,7 +70,6 @@ public class GankMeiZiFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         adapter = new ImageAdapter(mContentList,this);
-        content.setHasFixedSize(true);
         manager = new GridLayoutManager(getActivity(),2);
         manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
@@ -82,11 +86,8 @@ public class GankMeiZiFragment extends Fragment {
                 }
             }
         });
-        content.setLayoutManager(manager);
         content.setAdapter(adapter);
-        subscription.add(getReslut(1)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(adapter));
+        content.setLayoutManager(manager);
         content.addOnScrollListener(new EndlessRecyclerOnScrollListener(manager) {
             @Override
             public void onLoadMore(int page) {
@@ -97,6 +98,49 @@ public class GankMeiZiFragment extends Fragment {
                         .subscribe(adapter);
             }
         });
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        onRefresh();
+    }
+
+    @Override
+    public void onRefresh() {
+        if (!mSwipeRefreshLayout.isRefreshing()){
+            mSwipeRefreshLayout.setRefreshing(true);
+        }
+        mSwipeRefreshLayout.setRefreshing(true);
+        subscription.add(getReslut(1)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<GankInfo>>() {
+                    @Override
+                    public void onCompleted() {
+                        mSwipeRefreshLayout.setRefreshing(false);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(List<GankInfo> infos) {
+                        if (mContentList.size()==0){
+                            mContentList.addAll(infos);
+                            adapter.notifyItemRangeChanged(0,infos.size());
+                        }else {
+                            //判断这个时候的数据
+                            GankInfo info = mContentList.get(0);
+                            int index = infos.indexOf(info);
+                            if (index==0){
+                                return;
+                            }else if (index<number&&index>0){
+                                mContentList.addAll(infos.subList(0,index));
+                                adapter.notifyItemRangeInserted(0,index+1);
+                            }else if (index==-1){
+                                //暂时没有实现缓存所以暂时不会出现这个问题
+                            }
+                        }
+                    }
+                }));
     }
 
     @Override
