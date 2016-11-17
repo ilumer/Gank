@@ -151,7 +151,7 @@ public class GankMeiZiFragment extends Fragment
     }
 
      private Observable<List<GankInfo>> getReslut(int page){
-        return RetrofitHelper.getInstance().getGankDaily()
+        return RetrofitHelper.getInstance().getGank()
                 .GankTypeInfo("福利",number,page)
                 .compose(new HandleErrorTransformer())
                 .subscribeOn(Schedulers.io());

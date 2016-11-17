@@ -9,20 +9,15 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.fast.ilumer.gank.dao.DbOpenHelper;
-import com.fast.ilumer.gank.dao.Dbwrapper;
 import com.fast.ilumer.gank.fragment.GankMeiZiFragment;
 import com.fast.ilumer.gank.fragment.GankTypeFragment;
 import com.fast.ilumer.gank.rx.RxBus;
-import com.squareup.sqlbrite.BriteDatabase;
-import com.squareup.sqlbrite.SqlBrite;
 
 import butterknife.BindArray;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import rx.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity implements Dbwrapper{
+public class MainActivity extends AppCompatActivity{
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.tab)
@@ -31,8 +26,6 @@ public class MainActivity extends AppCompatActivity implements Dbwrapper{
     ViewPager mViewPager;
     @BindArray(R.array.various_type)
     String[] titles;
-    SqlBrite sqlBrite = SqlBrite.create();
-    DbOpenHelper helper;
 
 
     @Override
@@ -40,7 +33,6 @@ public class MainActivity extends AppCompatActivity implements Dbwrapper{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        helper = new DbOpenHelper(this);
         setSupportActionBar(mToolbar);
         mToolbar.setTitle(R.string.app_name);
         mViewPager.setAdapter(new ViewPageAdapter(getSupportFragmentManager(),titles,RxBus.getDefault()));
@@ -102,8 +94,4 @@ public class MainActivity extends AppCompatActivity implements Dbwrapper{
         }
     }
 
-    @Override
-    public BriteDatabase getBrite() {
-        return sqlBrite.wrapDatabaseHelper(helper, Schedulers.io());
-    }
 }

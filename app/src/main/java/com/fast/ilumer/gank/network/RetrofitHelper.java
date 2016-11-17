@@ -1,5 +1,11 @@
 package com.fast.ilumer.gank.network;
 
+import com.facebook.stetho.okhttp3.StethoInterceptor;
+import com.fast.ilumer.gank.App;
+
+import java.io.File;
+
+import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -12,14 +18,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class RetrofitHelper {
+    private volatile static RetrofitHelper helper=null;
+    private OkHttpClient client;
     private Retrofit retrofit;
 
     private RetrofitHelper(){
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(interceptor)
-                .build();
+        initClient();
         retrofit = new Retrofit.Builder()
                 .baseUrl("http://gank.io/api/")
                 .client(client)
@@ -28,16 +32,31 @@ public class RetrofitHelper {
         .build();
     }
 
-    private static class SingleonHolder{
-        private static RetrofitHelper Instance = new RetrofitHelper();
-    }
-
     public static RetrofitHelper getInstance(){
-        return SingleonHolder.Instance;
+        if (helper==null){
+            synchronized (RetrofitHelper.class){
+                if (helper==null){
+                    helper = new RetrofitHelper();
+                }
+            }
+        }
+        return helper;
     }
 
-    public  Gank getGankDaily(){
+    public  Gank getGank(){
         return retrofit.create(Gank.class);
+    }
+
+    public  void initClient(){
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        int cacheSize = 10*10*1024;
+        Cache cache = new Cache(new File(App.getAppContext().getCacheDir(),"httpCache"),cacheSize);
+        client = new OkHttpClient.Builder()
+                .cache(cache)
+                .addNetworkInterceptor(new StethoInterceptor())
+                .addInterceptor(interceptor)
+                .build();
     }
 
 
