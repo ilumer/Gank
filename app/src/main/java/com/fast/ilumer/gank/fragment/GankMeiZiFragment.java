@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 
 import com.fast.ilumer.gank.R;
 import com.fast.ilumer.gank.model.GankInfo;
-import com.fast.ilumer.gank.model.GankType;
 import com.fast.ilumer.gank.model.ImageAdapter;
 import com.fast.ilumer.gank.network.RetrofitHelper;
 import com.fast.ilumer.gank.recyclerview.EndlessRecyclerOnScrollListener;
@@ -28,7 +27,6 @@ import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-import rx.subjects.PublishSubject;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -49,13 +47,11 @@ public class GankMeiZiFragment extends Fragment
     ImageAdapter adapter;
     GridLayoutManager manager ;
     CompositeSubscription subscription;
-    PublishSubject<GankType> subject;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         subscription = new CompositeSubscription();
-        subject = PublishSubject.create();
     }
 
     @Nullable

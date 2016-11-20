@@ -8,7 +8,7 @@ import java.util.List;
  * Created by root on 10/16/16.
  */
 
-public class DailyData {
+public class GankDaily {
     public List<GankInfo> Android;
     public List<GankInfo> iOS;
     @SerializedName("前端")

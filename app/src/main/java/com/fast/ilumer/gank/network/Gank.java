@@ -1,6 +1,6 @@
 package com.fast.ilumer.gank.network;
 
-import com.fast.ilumer.gank.model.DailyData;
+import com.fast.ilumer.gank.model.GankDaily;
 import com.fast.ilumer.gank.model.GankInfo;
 
 import java.util.List;
@@ -16,7 +16,7 @@ import rx.Observable;
 
 public interface Gank {
     @GET("day/{year}/{month}/{day}")
-    Observable<Result<DailyData>> GankDailyInfo(@Path("year") int year, @Path("month") int month, @Path("day") int day);
+    Observable<Result<GankDaily>> GankDailyInfo(@Path("year") int year, @Path("month") int month, @Path("day") int day);
 
     @GET("data/{type}/{number}/{page}")
     Observable<Result<List<GankInfo>>> GankTypeInfo(@Path("type") String type, @Path("number") int number, @Path("page") int page);

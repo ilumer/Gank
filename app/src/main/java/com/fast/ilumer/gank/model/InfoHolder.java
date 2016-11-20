@@ -17,11 +17,11 @@ import butterknife.ButterKnife;
 
 public class InfoHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.recommender)
-    protected TextView mRecommender;
+    TextView mRecommender;
     @BindView(R.id.description)
-    protected TextView mDesc;
+    TextView mDesc;
     @BindString(R.string.none)
-    protected String none;
+    String none;
     public InfoHolder(View itemView) {
         super(itemView);
         ButterKnife.bind(this,itemView);

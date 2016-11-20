@@ -7,15 +7,6 @@ import java.util.Date;
  */
 
 public class GankInfo {
-    public static final String TABLE= "gank";
-    public static final String ID = "_id";
-    public static final String CREATEDAT = "createdAt";
-    public static final String PUBLISHEDAT = "publishedAt";
-    public static final String URL = "url";
-    public static final String WHO = "who";
-    public static final String DESC = "desc";
-    public static final String TYPE = "type";
-    public static final String USED = "used";
 
     private String _id;
     private String url;

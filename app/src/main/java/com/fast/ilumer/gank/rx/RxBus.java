@@ -12,7 +12,6 @@ import rx.subjects.Subject;
 
 public class RxBus {
     private static volatile RxBus defaultInstance;
-    //双锁单例
 
     private final Subject<Object, Object> bus;
     // PublishSubject只会把在订阅发生的时间点之后来自原始Observable的数据发射给观察者

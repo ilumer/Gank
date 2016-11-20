@@ -1,5 +1,6 @@
 package com.fast.ilumer.gank;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -8,10 +9,13 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
+import com.fast.ilumer.gank.activity.TodayGankActivity;
 import com.fast.ilumer.gank.fragment.GankMeiZiFragment;
 import com.fast.ilumer.gank.fragment.GankTypeFragment;
-import com.fast.ilumer.gank.rx.RxBus;
 
 import butterknife.BindArray;
 import butterknife.BindView;
@@ -35,7 +39,7 @@ public class MainActivity extends AppCompatActivity{
         ButterKnife.bind(this);
         setSupportActionBar(mToolbar);
         mToolbar.setTitle(R.string.app_name);
-        mViewPager.setAdapter(new ViewPageAdapter(getSupportFragmentManager(),titles,RxBus.getDefault()));
+        mViewPager.setAdapter(new ViewPageAdapter(getSupportFragmentManager(),titles));
         mTabLayout.setupWithViewPager(mViewPager);
     }
 
@@ -49,14 +53,36 @@ public class MainActivity extends AppCompatActivity{
         super.onResume();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.today_gank:{
+                Intent i = new Intent(this, TodayGankActivity.class);
+                startActivity(i);
+                return true;
+            }
+
+            case R.id.setting:{
+                return true;
+            }
+            default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
     public static class ViewPageAdapter extends FragmentStatePagerAdapter {
         private final String[] titles;
-        private RxBus bus;
 
-        private ViewPageAdapter(FragmentManager fm, String[] titles, RxBus bus) {
+        private ViewPageAdapter(FragmentManager fm, String[] titles) {
             super(fm);
             this.titles = titles;
-            this.bus = bus;
         }
 
         @Override
@@ -85,7 +111,7 @@ public class MainActivity extends AppCompatActivity{
 
         @Override
         public int getCount() {
-            return 8;
+            return titles.length;
         }
 
         @Override

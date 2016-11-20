@@ -14,4 +14,7 @@
 
     <string name="gril">妹子</string>
     <string name="none">null</string>
+    <string name="today_gank">今日干货</string>
+    <string name="setting">设置</string>
+    <string name="referrer">( %1$s )</string>
 </resources>
