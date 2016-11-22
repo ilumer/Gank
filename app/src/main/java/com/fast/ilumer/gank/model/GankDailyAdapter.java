@@ -2,6 +2,10 @@ package com.fast.ilumer.gank.model;
 
 import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,12 +47,15 @@ public class GankDailyAdapter extends RecyclerView.Adapter<GankDailyAdapter.Dali
     @Override
     public void onBindViewHolder(DaliyHolder holder, int position) {
         GankInfo info = list.get(position);
-        if (position==0){
-            holder.bind(info,true);
-        }else if (compareType(position-1,position)){
-            holder.bind(info,true);
-        }else {
-            holder.bind(info,false);
+        switch (getItemViewType(position)){
+            case TYPE_COMMON_TITLE_NEWS: {
+                holder.bind(info, true);
+                break;
+            }
+            case TYPE_COMMON_NEWS:{
+                holder.bind(info,false);
+                break;
+            }
         }
     }
 
@@ -66,13 +73,23 @@ public class GankDailyAdapter extends RecyclerView.Adapter<GankDailyAdapter.Dali
         return list.size();
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        if (position==0){
+            return TYPE_COMMON_TITLE_NEWS;
+        }else if (compareType(position-1,position)){
+            return TYPE_COMMON_TITLE_NEWS;
+        }
+        else {
+            return TYPE_COMMON_NEWS;
+        }
+    }
+
     public static class DaliyHolder extends RecyclerView.ViewHolder{
         @BindView(R.id.type)
-        TextView textView;
+        TextView type;
         @BindView(R.id.content)
         TextView content;
-        @BindView(R.id.referrer)
-        TextView referrer;
         @BindString(R.string.none)
         String none;
         @BindString(R.string.referrer)
@@ -84,14 +101,19 @@ public class GankDailyAdapter extends RecyclerView.Adapter<GankDailyAdapter.Dali
 
         protected void bind(GankInfo info,boolean isType){
             if (isType){
-                textView.setText(info.getType());
+                type.setText(info.getType());
+                type.setVisibility(View.VISIBLE);
             }
-            content.setText(info.getDesc());
+            SpannableStringBuilder builder = new SpannableStringBuilder(info.getDesc());
+            //用一个textview表示全部的内容就可以避免了两个textview第二个会出现换行的问题
             if (info.getWho()==null){
-                textView.setText(none);
+                builder.append(String.format(refer,none));
             }else {
-                textView.setText(String.format(refer,info.getWho()));
+                builder.append(String.format(refer,info.getWho()));
             }
+            builder.setSpan(new StyleSpan(R.style.desc_TextView_style),0,info.getDesc().length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+            builder.setSpan(new StyleSpan(R.style.refer_TextView_style),info.getDesc().length()+1,builder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            content.setText(builder);
         }
     }
 }

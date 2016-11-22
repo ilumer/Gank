@@ -15,7 +15,7 @@ public class GankDaily {
     public List<GankInfo> Fontend;
     @SerializedName("瞎推荐")
     public List<GankInfo> Recommd;
-    @SerializedName("休闲视频")
+    @SerializedName("休息视频")
     public List<GankInfo> Video;
     @SerializedName("拓展资源")
     public List<GankInfo> Resources;

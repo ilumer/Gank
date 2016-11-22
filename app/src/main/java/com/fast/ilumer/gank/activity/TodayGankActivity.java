@@ -1,9 +1,11 @@
 package com.fast.ilumer.gank.activity;
 
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -35,11 +37,14 @@ public class TodayGankActivity extends AppCompatActivity {
     private CompositeSubscription subscription;
     private GankDailyAdapter adapter;
     private LinearLayoutManager linearlayoutManager;
+    private BottomSheetBehavior behavior;
     private List<GankInfo> contentList = new ArrayList<>();
     @BindView(R.id.gril)
     ImageView gril;
     @BindView(R.id.content)
     RecyclerView content;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
     Unbinder unbinder;
     Date currentDate= new Date();
     DayPath dayPath = new DayPath();
@@ -50,31 +55,15 @@ public class TodayGankActivity extends AppCompatActivity {
         setContentView(R.layout.activity_today_gank);
         unbinder = ButterKnife.bind(this);
         ((RatioImageView) gril).setRatio(1.218f);
+        setSupportActionBar(toolbar);
+        behavior = BottomSheetBehavior.from(content);
         initDayPath();
         subscription = new CompositeSubscription();
-    }
-
-    private void initDayPath(){
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(currentDate);
-        dayPath.year = cal.get(Calendar.YEAR);
-        dayPath.month = cal.get(Calendar.MONTH);
-        dayPath.day = cal.get(Calendar.DAY_OF_MONTH);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         adapter = new GankDailyAdapter(contentList,this);
         content.setHasFixedSize(true);
         linearlayoutManager = new LinearLayoutManager(this);
         content.setLayoutManager(linearlayoutManager);
         content.setAdapter(adapter);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
         Observable<GankDaily> result = Observable.just(dayPath)
                 .concatMap(getGank)
                 .map(new Func1<Gank.Result<GankDaily>, GankDaily>() {
@@ -99,15 +88,15 @@ public class TodayGankActivity extends AppCompatActivity {
                 return gankDaily.Meizi.get(0);
             }
         }).observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Action1<GankInfo>() {
-            @Override
-            public void call(GankInfo info) {
-                Glide.with(TodayGankActivity.this)
-                        .load(info.getUrl())
-                        .centerCrop()
-                        .into(gril);
-            }
-        }));
+                .subscribe(new Action1<GankInfo>() {
+                    @Override
+                    public void call(GankInfo info) {
+                        Glide.with(TodayGankActivity.this)
+                                .load(info.getUrl())
+                                .centerCrop()
+                                .into(gril);
+                    }
+                }));
         subscription.add(result.map(new Func1<GankDaily, List<GankInfo>>() {
             @Override
             public List<GankInfo> call(GankDaily gankDaily) {
@@ -134,14 +123,25 @@ public class TodayGankActivity extends AppCompatActivity {
             }
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<List<GankInfo>>() {
-            @Override
-            public void call(List<GankInfo> list) {
-                contentList.addAll(list);
-                adapter.notifyItemRangeInserted(0,list.size());
-            }
-        }));
+                    @Override
+                    public void call(List<GankInfo> list) {
+                        contentList.addAll(list);
+                        adapter.notifyItemRangeInserted(0,list.size());
+                    }
+                }));
 
     }
+
+
+    private void initDayPath(){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(currentDate);
+        dayPath.year = cal.get(Calendar.YEAR);
+        dayPath.month = cal.get(Calendar.MONTH)+1;
+        //http://stackoverflow.com/questions/344380/why-is-january-month-0-in-java-calendar
+        dayPath.day = cal.get(Calendar.DAY_OF_MONTH)-1;
+    }
+
 
     private final Func1<DayPath,Observable<Gank.Result<GankDaily>>> getGank = new Func1<DayPath, Observable<Gank.Result<GankDaily>>>() {
         @Override
