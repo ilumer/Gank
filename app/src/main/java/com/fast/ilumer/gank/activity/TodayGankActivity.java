@@ -39,6 +39,7 @@ public class TodayGankActivity extends AppCompatActivity {
     private LinearLayoutManager linearlayoutManager;
     private BottomSheetBehavior behavior;
     private List<GankInfo> contentList = new ArrayList<>();
+    private  boolean hasGank ;
     @BindView(R.id.gril)
     ImageView gril;
     @BindView(R.id.content)
@@ -54,7 +55,7 @@ public class TodayGankActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_today_gank);
         unbinder = ButterKnife.bind(this);
-        ((RatioImageView) gril).setRatio(1.218f);
+        ((RatioImageView) gril).setRatio(0.618f);
         setSupportActionBar(toolbar);
         behavior = BottomSheetBehavior.from(content);
         initDayPath();
@@ -76,7 +77,7 @@ public class TodayGankActivity extends AppCompatActivity {
                     public Boolean call(GankDaily gankDaily) {
                         return gankDaily!=null;
                     }
-                }).publish().autoConnect(2);
+                }).share();
         subscription.add(result.filter(new Func1<GankDaily, Boolean>() {
             @Override
             public Boolean call(GankDaily gankDaily) {
@@ -129,7 +130,6 @@ public class TodayGankActivity extends AppCompatActivity {
                         adapter.notifyItemRangeInserted(0,list.size());
                     }
                 }));
-
     }
 
 
@@ -140,6 +140,8 @@ public class TodayGankActivity extends AppCompatActivity {
         dayPath.month = cal.get(Calendar.MONTH)+1;
         //http://stackoverflow.com/questions/344380/why-is-january-month-0-in-java-calendar
         dayPath.day = cal.get(Calendar.DAY_OF_MONTH)-1;
+        int number = cal.get(Calendar.DAY_OF_WEEK);
+        hasGank = number<7&&number>1;
     }
 
 
@@ -150,6 +152,7 @@ public class TodayGankActivity extends AppCompatActivity {
                     .subscribeOn(Schedulers.io());
         }
     };
+
 
     @Override
     protected void onDestroy() {

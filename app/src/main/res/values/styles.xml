@@ -16,7 +16,6 @@
     </style>
 
     <style name="Type.TextView.style" parent="@android:style/TextAppearance.Large">
-        <item name="android:textSize">30sp</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@android:color/background_dark</item>
@@ -25,18 +24,14 @@
         <item name="android:layout_marginBottom">12dp</item>
     </style>
 
-    <style name="desc.TextView.style" parent="@android:style/TextAppearance.Medium">
-        <item name="android:textSize">16sp</item>
+    <style name="desc.TextView.style" parent="@android:style/TextAppearance">
         <item name="android:textColor">#FF686262</item>
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="refer.TextView.style" parent="@android:style/TextAppearance.Small">
-        <item name="android:textSize">8sp</item>
+    <style name="refer.TextView.style" parent="@android:style/TextAppearance">
         <item name="android:textColor">#FF686262</item>
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
 </resources>

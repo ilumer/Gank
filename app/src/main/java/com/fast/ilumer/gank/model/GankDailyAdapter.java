@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.style.StyleSpan;
+import android.text.style.TextAppearanceSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,11 +49,11 @@ public class GankDailyAdapter extends RecyclerView.Adapter<GankDailyAdapter.Dali
         GankInfo info = list.get(position);
         switch (getItemViewType(position)){
             case TYPE_COMMON_TITLE_NEWS: {
-                holder.bind(info, true);
+                holder.bind(info, true,host);
                 break;
             }
             case TYPE_COMMON_NEWS:{
-                holder.bind(info,false);
+                holder.bind(info,false,host);
                 break;
             }
         }
@@ -99,7 +99,7 @@ public class GankDailyAdapter extends RecyclerView.Adapter<GankDailyAdapter.Dali
             ButterKnife.bind(this,itemView);
         }
 
-        protected void bind(GankInfo info,boolean isType){
+        protected void bind(GankInfo info,boolean isType,Activity host){
             if (isType){
                 type.setText(info.getType());
                 type.setVisibility(View.VISIBLE);
@@ -111,8 +111,10 @@ public class GankDailyAdapter extends RecyclerView.Adapter<GankDailyAdapter.Dali
             }else {
                 builder.append(String.format(refer,info.getWho()));
             }
-            builder.setSpan(new StyleSpan(R.style.desc_TextView_style),0,info.getDesc().length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-            builder.setSpan(new StyleSpan(R.style.refer_TextView_style),info.getDesc().length()+1,builder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            builder.setSpan(new TextAppearanceSpan(host,R.style.desc_TextView_style),0,info.getDesc().length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+            builder.setSpan(new TextAppearanceSpan(host,R.style.refer_TextView_style),info.getDesc().length()+1,builder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            //http://stackoverflow.com/questions/8999781/android-two-sentences-two-styles-one-textview
+            //实现两个style的textview
             content.setText(builder);
         }
     }
