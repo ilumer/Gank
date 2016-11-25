@@ -12,20 +12,21 @@ import android.view.ViewGroup;
 
 import com.fast.ilumer.gank.R;
 import com.fast.ilumer.gank.model.GankInfo;
+import com.fast.ilumer.gank.model.GankRepositories;
 import com.fast.ilumer.gank.model.InfoAdapter;
+import com.fast.ilumer.gank.network.Results;
 import com.fast.ilumer.gank.network.RetrofitHelper;
 import com.fast.ilumer.gank.recyclerview.DividerItemDecoration;
 import com.fast.ilumer.gank.recyclerview.EndlessRecyclerOnScrollListener;
-import com.fast.ilumer.gank.rx.HandleErrorTransformer;
 import com.squareup.sqlbrite.BriteDatabase;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import retrofit2.adapter.rxjava.Result;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -118,24 +119,10 @@ public class GankTypeFragment extends Fragment
         }
         mSwipeRefreshLayout.setRefreshing(true);
         mSubscription.add(getResult(1)
-                .map(new Func1<List<GankInfo>, List<GankInfo>>() {
-                    @Override
-                    public List<GankInfo> call(List<GankInfo> list) {
-                        if (Collections.disjoint(list,mContentList)){
-                            return list;
-                            //没有本地缓存 出现的情况为单日的gank单个类型增长超过10
-                            //几乎不存在
-                        }else {
-                            GankInfo info = mContentList.get(0);
-                            int position = list.indexOf(info);
-                            return list.subList(0,position);
-                        }
-                    }
-                })
                 .filter(new Func1<List<GankInfo>, Boolean>() {
                     @Override
                     public Boolean call(List<GankInfo> list) {
-                        return list.size()>0;
+                        return mContentList.size()==0||mContentList.containsAll(list);
                     }
                 })
         .observeOn(AndroidSchedulers.mainThread())
@@ -144,7 +131,6 @@ public class GankTypeFragment extends Fragment
             public void onCompleted() {
                 mSwipeRefreshLayout.setRefreshing(false);
             }
-
             @Override
             public void onError(Throwable e) {
                 mSwipeRefreshLayout.setRefreshing(false);
@@ -152,15 +138,28 @@ public class GankTypeFragment extends Fragment
 
             @Override
             public void onNext(List<GankInfo> list) {
-                mContentList.addAll(0,list);
-                mContentAdapter.notifyItemRangeInserted(0,list.size());
+                if (mContentList.size()>10) {
+                    for (int i = 0; i < list.size(); i++) {
+                        mContentList.set(i, list.get(i));
+                    }
+                    mContentAdapter.notifyItemRangeChanged(0, list.size());
+                }else {
+                    mContentList.addAll(list);
+                    mContentAdapter.notifyItemRangeInserted(0,list.size());
+                }
             }
         }));
 
     }
     public Observable<List<GankInfo>> getResult(int page){
         return RetrofitHelper.getInstance().getGank().GankTypeInfo(type,number,page)
-                .compose(new HandleErrorTransformer())
+                .filter(Results.isSuccessful())
+                .map(new Func1<Result<GankRepositories<List<GankInfo>>>, List<GankInfo>>() {
+                    @Override
+                    public List<GankInfo> call(Result<GankRepositories<List<GankInfo>>> gankRepositoriesResult) {
+                        return gankRepositoriesResult.response().body().results;
+                    }
+                })
                 .subscribeOn(Schedulers.io());
     }
 }

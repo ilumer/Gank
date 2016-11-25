@@ -17,4 +17,6 @@
     <string name="today_gank">今日干货</string>
     <string name="setting">设置</string>
     <string name="referrer">(%1$s)</string>
+    <string name="no_gank">抱歉今天还没有干货啊</string>
+    <string name="update_gank">抱歉今天的干货还没有更新</string>
 </resources>

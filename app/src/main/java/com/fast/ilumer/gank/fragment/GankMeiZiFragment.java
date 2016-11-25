@@ -12,10 +12,10 @@ import android.view.ViewGroup;
 
 import com.fast.ilumer.gank.R;
 import com.fast.ilumer.gank.model.GankInfo;
+import com.fast.ilumer.gank.model.GankRepositories;
 import com.fast.ilumer.gank.model.ImageAdapter;
 import com.fast.ilumer.gank.network.RetrofitHelper;
 import com.fast.ilumer.gank.recyclerview.EndlessRecyclerOnScrollListener;
-import com.fast.ilumer.gank.rx.HandleErrorTransformer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +23,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import retrofit2.adapter.rxjava.Result;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -119,21 +121,14 @@ public class GankMeiZiFragment extends Fragment
 
                     @Override
                     public void onNext(List<GankInfo> infos) {
-                        if (mContentList.size()==0){
-                            mContentList.addAll(infos);
-                            adapter.notifyItemRangeChanged(0,infos.size());
-                        }else {
-                            //判断这个时候的数据
-                            GankInfo info = mContentList.get(0);
-                            int index = infos.indexOf(info);
-                            if (index==0){
-                                return;
-                            }else if (index<number&&index>0){
-                                mContentList.addAll(infos.subList(0,index));
-                                adapter.notifyItemRangeInserted(0,index+1);
-                            }else if (index==-1){
-                                //暂时没有实现缓存所以暂时不会出现这个问题
+                        if (mContentList.size()>10) {
+                            for (int i = 0; i < infos.size(); i++) {
+                                mContentList.set(i, infos.get(i));
                             }
+                            adapter.notifyItemRangeChanged(0, infos.size());
+                        }else {
+                            mContentList.addAll(infos);
+                            adapter.notifyItemRangeInserted(0,infos.size());
                         }
                     }
                 }));
@@ -149,7 +144,12 @@ public class GankMeiZiFragment extends Fragment
      private Observable<List<GankInfo>> getReslut(int page){
         return RetrofitHelper.getInstance().getGank()
                 .GankTypeInfo("福利",number,page)
-                .compose(new HandleErrorTransformer())
+                .map(new Func1<Result<GankRepositories<List<GankInfo>>>, List<GankInfo>>() {
+                    @Override
+                    public List<GankInfo> call(Result<GankRepositories<List<GankInfo>>> gankRepositoriesResult) {
+                        return gankRepositoriesResult.response().body().results;
+                    }
+                })
                 .subscribeOn(Schedulers.io());
     }
 }

@@ -6,15 +6,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.fast.ilumer.gank.R;
+import com.fast.ilumer.gank.fragment.TipDialogFragment;
 import com.fast.ilumer.gank.model.GankDaily;
 import com.fast.ilumer.gank.model.GankDailyAdapter;
 import com.fast.ilumer.gank.model.GankInfo;
-import com.fast.ilumer.gank.network.Gank;
+import com.fast.ilumer.gank.model.GankRepositories;
+import com.fast.ilumer.gank.network.Results;
 import com.fast.ilumer.gank.network.RetrofitHelper;
+import com.fast.ilumer.gank.rx.Funcs;
 import com.fast.ilumer.gank.widget.RatioImageView;
 
 import java.util.ArrayList;
@@ -25,6 +29,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import retrofit2.adapter.rxjava.Result;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -55,7 +60,7 @@ public class TodayGankActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_today_gank);
         unbinder = ButterKnife.bind(this);
-        ((RatioImageView) gril).setRatio(0.618f);
+        ((RatioImageView) gril).setRatio(0.818f);
         setSupportActionBar(toolbar);
         behavior = BottomSheetBehavior.from(content);
         initDayPath();
@@ -65,20 +70,30 @@ public class TodayGankActivity extends AppCompatActivity {
         linearlayoutManager = new LinearLayoutManager(this);
         content.setLayoutManager(linearlayoutManager);
         content.setAdapter(adapter);
-        Observable<GankDaily> result = Observable.just(dayPath)
+        Observable<Result<GankRepositories<GankDaily>>> result = Observable.just(dayPath)
                 .concatMap(getGank)
-                .map(new Func1<Gank.Result<GankDaily>, GankDaily>() {
-                    @Override
-                    public GankDaily call(Gank.Result<GankDaily> Result) {
-                        return Result.results;
-                    }
-                }).filter(new Func1<GankDaily, Boolean>() {
-                    @Override
-                    public Boolean call(GankDaily gankDaily) {
-                        return gankDaily!=null;
-                    }
-                }).share();
-        subscription.add(result.filter(new Func1<GankDaily, Boolean>() {
+                .observeOn(AndroidSchedulers.mainThread())
+                .share();
+
+        result.filter(Funcs.not(Results.isSuccessful()))
+                .subscribe(GankTodayError);
+        //检测网络异常
+
+        Observable<GankDaily> returnData = result.
+                filter(Results.isSuccessful())
+                .map(new Func1<Result<GankRepositories<GankDaily>>, GankDaily>() {
+            @Override
+            public GankDaily call(Result<GankRepositories<GankDaily>> gankRepositoriesResult) {
+                return gankRepositoriesResult.response().body().results;
+            }
+        });
+
+        Observable<GankDaily> postData = returnData.filter(Results.ISNULL());
+
+        returnData.filter(Funcs.not(Results.ISNULL()))
+                .subscribe(GankTodayUpdate);
+
+        subscription.add(postData.filter(new Func1<GankDaily, Boolean>() {
             @Override
             public Boolean call(GankDaily gankDaily) {
                 return gankDaily.Meizi!=null;
@@ -88,7 +103,7 @@ public class TodayGankActivity extends AppCompatActivity {
             public GankInfo call(GankDaily gankDaily) {
                 return gankDaily.Meizi.get(0);
             }
-        }).observeOn(AndroidSchedulers.mainThread())
+        })
                 .subscribe(new Action1<GankInfo>() {
                     @Override
                     public void call(GankInfo info) {
@@ -98,31 +113,8 @@ public class TodayGankActivity extends AppCompatActivity {
                                 .into(gril);
                     }
                 }));
-        subscription.add(result.map(new Func1<GankDaily, List<GankInfo>>() {
-            @Override
-            public List<GankInfo> call(GankDaily gankDaily) {
-                List<GankInfo> list = new ArrayList<>();
-                if (gankDaily.Android!=null){
-                    list.addAll(gankDaily.Android);
-                }
-                if (gankDaily.iOS!=null){
-                    list.addAll(gankDaily.iOS);
-                }
-                if (gankDaily.Fontend!=null){
-                    list.addAll(gankDaily.Fontend);
-                }
-                if (gankDaily.Recommd!=null){
-                    list.addAll(gankDaily.Recommd);
-                }
-                if (gankDaily.Resources!=null){
-                    list.addAll(gankDaily.Resources);
-                }
-                if (gankDaily.Video!=null){
-                    list.addAll(gankDaily.Video);
-                }
-                return list;
-            }
-        }).observeOn(AndroidSchedulers.mainThread())
+        subscription.add(postData.map(mapList)
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<List<GankInfo>>() {
                     @Override
                     public void call(List<GankInfo> list) {
@@ -139,17 +131,67 @@ public class TodayGankActivity extends AppCompatActivity {
         dayPath.year = cal.get(Calendar.YEAR);
         dayPath.month = cal.get(Calendar.MONTH)+1;
         //http://stackoverflow.com/questions/344380/why-is-january-month-0-in-java-calendar
-        dayPath.day = cal.get(Calendar.DAY_OF_MONTH)-1;
+        dayPath.day = cal.get(Calendar.DAY_OF_MONTH);
         int number = cal.get(Calendar.DAY_OF_WEEK);
         hasGank = number<7&&number>1;
     }
 
 
-    private final Func1<DayPath,Observable<Gank.Result<GankDaily>>> getGank = new Func1<DayPath, Observable<Gank.Result<GankDaily>>>() {
+    private final Func1<DayPath,Observable<Result<GankRepositories<GankDaily>>>> getGank =
+            new Func1<DayPath, Observable<Result<GankRepositories<GankDaily>>>>() {
         @Override
-        public Observable<Gank.Result<GankDaily>> call(DayPath dayPath) {
+        public Observable<Result<GankRepositories<GankDaily>>> call(DayPath dayPath) {
             return RetrofitHelper.getInstance().getGank().GankDailyInfo(dayPath.year,dayPath.month,dayPath.day)
                     .subscribeOn(Schedulers.io());
+        }
+    };
+
+    private final Func1<GankDaily,List<GankInfo>> mapList = new Func1<GankDaily, List<GankInfo>>() {
+        @Override
+        public List<GankInfo> call(GankDaily gankDaily) {
+            List<GankInfo> list = new ArrayList<>();
+            if (gankDaily.Android!=null){
+                list.addAll(gankDaily.Android);
+            }
+            if (gankDaily.iOS!=null){
+                list.addAll(gankDaily.iOS);
+            }
+            if (gankDaily.Fontend!=null){
+                list.addAll(gankDaily.Fontend);
+            }
+            if (gankDaily.Recommd!=null){
+                list.addAll(gankDaily.Recommd);
+            }
+            if (gankDaily.Resources!=null){
+                list.addAll(gankDaily.Resources);
+            }
+            if (gankDaily.Video!=null){
+                list.addAll(gankDaily.Video);
+            }
+            return list;
+        }
+    };
+
+    private final Action1<Result<GankRepositories<GankDaily>>> GankTodayError = new Action1<Result<GankRepositories<GankDaily>>>() {
+        @Override
+        public void call(Result<GankRepositories<GankDaily>> gankRepositoriesResult) {
+            if (gankRepositoriesResult.isError()){
+                Log.e("network","TAG");
+            }
+        }
+    };
+
+    private final Action1<GankDaily> GankTodayUpdate = new Action1<GankDaily>() {
+        @Override
+        public void call(GankDaily gankDaily) {
+
+            if (hasGank){
+                TipDialogFragment HasGankFragment = TipDialogFragment.newInstance("干货还没有更新啦");
+                HasGankFragment.show(getSupportFragmentManager(),"yes");
+            }else {
+                TipDialogFragment HasGankFragment = TipDialogFragment.newInstance("今天没有干货啦");
+                HasGankFragment.show(getSupportFragmentManager(),"yes");
+            }
         }
     };
 
