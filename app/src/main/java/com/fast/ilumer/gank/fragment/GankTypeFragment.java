@@ -14,7 +14,7 @@ import com.fast.ilumer.gank.R;
 import com.fast.ilumer.gank.model.GankInfo;
 import com.fast.ilumer.gank.model.GankRepositories;
 import com.fast.ilumer.gank.model.InfoAdapter;
-import com.fast.ilumer.gank.network.Results;
+import com.fast.ilumer.gank.rx.Results;
 import com.fast.ilumer.gank.network.RetrofitHelper;
 import com.fast.ilumer.gank.recyclerview.DividerItemDecoration;
 import com.fast.ilumer.gank.recyclerview.EndlessRecyclerOnScrollListener;

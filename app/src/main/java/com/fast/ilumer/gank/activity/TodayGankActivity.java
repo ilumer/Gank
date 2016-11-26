@@ -7,19 +7,25 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.fast.ilumer.gank.R;
+import com.fast.ilumer.gank.dao.Db;
+import com.fast.ilumer.gank.dao.DbOpenHelper;
 import com.fast.ilumer.gank.fragment.TipDialogFragment;
 import com.fast.ilumer.gank.model.GankDaily;
 import com.fast.ilumer.gank.model.GankDailyAdapter;
 import com.fast.ilumer.gank.model.GankInfo;
 import com.fast.ilumer.gank.model.GankRepositories;
-import com.fast.ilumer.gank.network.Results;
 import com.fast.ilumer.gank.network.RetrofitHelper;
 import com.fast.ilumer.gank.rx.Funcs;
+import com.fast.ilumer.gank.rx.Results;
 import com.fast.ilumer.gank.widget.RatioImageView;
+import com.squareup.sqlbrite.BriteDatabase;
+import com.squareup.sqlbrite.SqlBrite;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -45,12 +51,17 @@ public class TodayGankActivity extends AppCompatActivity {
     private BottomSheetBehavior behavior;
     private List<GankInfo> contentList = new ArrayList<>();
     private  boolean hasGank ;
+    private SqlBrite sqlBrite = new SqlBrite.Builder().build();
+    private BriteDatabase db ;
+    private GankDaily temp;
     @BindView(R.id.gril)
     ImageView gril;
     @BindView(R.id.content)
     RecyclerView content;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+    @BindView(R.id.empty)
+    TextView textView;
     Unbinder unbinder;
     Date currentDate= new Date();
     DayPath dayPath = new DayPath();
@@ -61,6 +72,7 @@ public class TodayGankActivity extends AppCompatActivity {
         setContentView(R.layout.activity_today_gank);
         unbinder = ButterKnife.bind(this);
         ((RatioImageView) gril).setRatio(0.818f);
+        db = sqlBrite.wrapDatabaseHelper(new DbOpenHelper(this),Schedulers.io());
         setSupportActionBar(toolbar);
         behavior = BottomSheetBehavior.from(content);
         initDayPath();
@@ -70,13 +82,18 @@ public class TodayGankActivity extends AppCompatActivity {
         linearlayoutManager = new LinearLayoutManager(this);
         content.setLayoutManager(linearlayoutManager);
         content.setAdapter(adapter);
+        subscription.add(db.createQuery(Db.TODAY_TABLE_NAME,"select * from "+Db.TODAY_TABLE_NAME)
+                .mapToOne(GankDaily.parse)
+                .filter(Funcs.not(Results.ISNULL()))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(GanKTodaySuccess));
         Observable<Result<GankRepositories<GankDaily>>> result = Observable.just(dayPath)
                 .concatMap(getGank)
                 .observeOn(AndroidSchedulers.mainThread())
                 .share();
 
-        result.filter(Funcs.not(Results.isSuccessful()))
-                .subscribe(GankTodayError);
+        subscription.add(result.filter(Funcs.not(Results.isSuccessful()))
+                .subscribe(GankTodayError));
         //检测网络异常
 
         Observable<GankDaily> returnData = result.
@@ -93,35 +110,17 @@ public class TodayGankActivity extends AppCompatActivity {
         returnData.filter(Funcs.not(Results.ISNULL()))
                 .subscribe(GankTodayUpdate);
 
-        subscription.add(postData.filter(new Func1<GankDaily, Boolean>() {
-            @Override
-            public Boolean call(GankDaily gankDaily) {
-                return gankDaily.Meizi!=null;
-            }
-        }).map(new Func1<GankDaily, GankInfo>() {
-            @Override
-            public GankInfo call(GankDaily gankDaily) {
-                return gankDaily.Meizi.get(0);
-            }
-        })
-                .subscribe(new Action1<GankInfo>() {
+        subscription.add(postData
+                .filter(new Func1<GankDaily, Boolean>() {
                     @Override
-                    public void call(GankInfo info) {
-                        Glide.with(TodayGankActivity.this)
-                                .load(info.getUrl())
-                                .centerCrop()
-                                .into(gril);
+                    public Boolean call(GankDaily daily) {
+                        return daily.equals(temp);
+                        //同一天里两次更新数据库
                     }
-                }));
-        subscription.add(postData.map(mapList)
+                })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<List<GankInfo>>() {
-                    @Override
-                    public void call(List<GankInfo> list) {
-                        contentList.addAll(list);
-                        adapter.notifyItemRangeInserted(0,list.size());
-                    }
-                }));
+                .subscribe(dataInsert));
+        //由于gank的每日的更新的item不确定所以对应的id更新的数据库的想法有一点的不合实际
     }
 
 
@@ -136,6 +135,22 @@ public class TodayGankActivity extends AppCompatActivity {
         hasGank = number<7&&number>1;
     }
 
+    private final Action1<GankDaily> dataInsert = new Action1<GankDaily>() {
+        @Override
+        public void call(GankDaily gankDaily) {
+            BriteDatabase.Transaction transaction = db.newTransaction();
+            try{
+                db.execute("delete From "+Db.TODAY_TABLE_NAME+"where id > -1");
+                db.insert(Db.TODAY_TABLE_NAME,new GankInfo.Builder(gankDaily.Meizi.get(0)).build());
+                List<GankInfo> infoList = GanKDailyToList(gankDaily);
+                for (GankInfo info:infoList){
+                    db.insert(Db.TODAY_TABLE_NAME,new GankInfo.Builder(info).build());
+                }
+            }finally {
+                transaction.end();
+            }
+        }
+    };
 
     private final Func1<DayPath,Observable<Result<GankRepositories<GankDaily>>>> getGank =
             new Func1<DayPath, Observable<Result<GankRepositories<GankDaily>>>>() {
@@ -146,38 +161,32 @@ public class TodayGankActivity extends AppCompatActivity {
         }
     };
 
-    private final Func1<GankDaily,List<GankInfo>> mapList = new Func1<GankDaily, List<GankInfo>>() {
+    //这里可以通过多播来实现了图片和adapter的加载 但是意义不大所以改为了这种方式
+    private final Action1<GankDaily> GanKTodaySuccess = new Action1<GankDaily>() {
         @Override
-        public List<GankInfo> call(GankDaily gankDaily) {
-            List<GankInfo> list = new ArrayList<>();
-            if (gankDaily.Android!=null){
-                list.addAll(gankDaily.Android);
+        public void call(GankDaily gankDaily) {
+            temp = gankDaily;
+            if (gankDaily.Meizi.get(0)!=null){
+                Glide.with(TodayGankActivity.this)
+                        .load(gankDaily.Meizi.get(0).getUrl()).into(gril);
             }
-            if (gankDaily.iOS!=null){
-                list.addAll(gankDaily.iOS);
-            }
-            if (gankDaily.Fontend!=null){
-                list.addAll(gankDaily.Fontend);
-            }
-            if (gankDaily.Recommd!=null){
-                list.addAll(gankDaily.Recommd);
-            }
-            if (gankDaily.Resources!=null){
-                list.addAll(gankDaily.Resources);
-            }
-            if (gankDaily.Video!=null){
-                list.addAll(gankDaily.Video);
-            }
-            return list;
+           List<GankInfo> list = GanKDailyToList(gankDaily);
+            contentList.addAll(list);
+            adapter.notifyItemRangeInserted(0,list.size());
         }
     };
 
-    private final Action1<Result<GankRepositories<GankDaily>>> GankTodayError = new Action1<Result<GankRepositories<GankDaily>>>() {
+
+    private final Action1<Result<GankRepositories<GankDaily>>>   GankTodayError = new Action1<Result<GankRepositories<GankDaily>>>() {
         @Override
         public void call(Result<GankRepositories<GankDaily>> gankRepositoriesResult) {
             if (gankRepositoriesResult.isError()){
                 Log.e("network","TAG");
+            }else {
+                Log.e("response code",gankRepositoriesResult.response().code()+"");
+                //可以处理不同的status code
             }
+            textView.setVisibility(View.VISIBLE);
         }
     };
 
@@ -187,20 +196,42 @@ public class TodayGankActivity extends AppCompatActivity {
 
             if (hasGank){
                 TipDialogFragment HasGankFragment = TipDialogFragment.newInstance("干货还没有更新啦");
-                HasGankFragment.show(getSupportFragmentManager(),"yes");
+                HasGankFragment.show(getSupportFragmentManager(),"UPDATE_GANK");
             }else {
                 TipDialogFragment HasGankFragment = TipDialogFragment.newInstance("今天没有干货啦");
-                HasGankFragment.show(getSupportFragmentManager(),"yes");
+                HasGankFragment.show(getSupportFragmentManager(),"NO_GANK");
             }
         }
     };
-
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unbinder.unbind();
         subscription.clear();
+    }
+
+    private List<GankInfo> GanKDailyToList(GankDaily daily){
+        List<GankInfo> list = new ArrayList<>();
+        if (daily.Android!=null){
+            list.addAll(daily.Android);
+        }
+        if (daily.iOS!=null){
+            list.addAll(daily.iOS);
+        }
+        if (daily.Fontend!=null){
+            list.addAll(daily.Fontend);
+        }
+        if (daily.Recommd!=null){
+            list.addAll(daily.Recommd);
+        }
+        if (daily.Resources!=null){
+            list.addAll(daily.Resources);
+        }
+        if (daily.Video!=null){
+            list.addAll(daily.Video);
+        }
+        return list;
     }
 
     public static class DayPath{

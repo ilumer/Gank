@@ -1,4 +1,4 @@
-package com.fast.ilumer.gank.network;
+package com.fast.ilumer.gank.rx;
 
 import com.fast.ilumer.gank.model.GankDaily;
 
