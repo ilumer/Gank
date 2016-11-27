@@ -17,10 +17,10 @@ public final class Results {
         }
     };
 
-    private static final Func1<GankDaily,Boolean> ISNONE = new Func1<GankDaily, Boolean>() {
+    private static final Func1<GankDaily,Boolean> NONE = new Func1<GankDaily, Boolean>() {
         @Override
         public Boolean call(GankDaily gankDaily) {
-            return gankDaily.Android!=null&&gankDaily.iOS!=null;
+            return gankDaily.Android.size()==0&&gankDaily.iOS.size()==0;
             //这两个标志位代表是否为空
         }
     };
@@ -28,8 +28,8 @@ public final class Results {
         return SUCCESSFUL;
     }
 
-    public static Func1<GankDaily,Boolean> ISNULL(){
-        return ISNONE;
+    public static Func1<GankDaily,Boolean> isNull(){
+        return NONE;
     }
 
     private Results(){

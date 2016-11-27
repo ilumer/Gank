@@ -15,6 +15,7 @@ import com.bumptech.glide.Glide;
 import com.fast.ilumer.gank.R;
 import com.fast.ilumer.gank.dao.Db;
 import com.fast.ilumer.gank.dao.DbOpenHelper;
+import com.fast.ilumer.gank.dao.GankInfoContract;
 import com.fast.ilumer.gank.fragment.TipDialogFragment;
 import com.fast.ilumer.gank.model.GankDaily;
 import com.fast.ilumer.gank.model.GankDailyAdapter;
@@ -84,7 +85,7 @@ public class TodayGankActivity extends AppCompatActivity {
         content.setAdapter(adapter);
         subscription.add(db.createQuery(Db.TODAY_TABLE_NAME,"select * from "+Db.TODAY_TABLE_NAME)
                 .mapToOne(GankDaily.parse)
-                .filter(Funcs.not(Results.ISNULL()))
+                .filter(Funcs.not(Results.isNull()))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(GanKTodaySuccess));
         Observable<Result<GankRepositories<GankDaily>>> result = Observable.just(dayPath)
@@ -105,20 +106,20 @@ public class TodayGankActivity extends AppCompatActivity {
             }
         });
 
-        Observable<GankDaily> postData = returnData.filter(Results.ISNULL());
+        Observable<GankDaily> postData = returnData.filter(Funcs.not(Results.isNull()));
 
-        returnData.filter(Funcs.not(Results.ISNULL()))
+        returnData.filter(Results.isNull())
                 .subscribe(GankTodayUpdate);
 
         subscription.add(postData
                 .filter(new Func1<GankDaily, Boolean>() {
                     @Override
                     public Boolean call(GankDaily daily) {
-                        return daily.equals(temp);
+                        return !daily.equals(temp);
                         //同一天里两次更新数据库
                     }
                 })
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
                 .subscribe(dataInsert));
         //由于gank的每日的更新的item不确定所以对应的id更新的数据库的想法有一点的不合实际
     }
@@ -128,7 +129,7 @@ public class TodayGankActivity extends AppCompatActivity {
         Calendar cal = Calendar.getInstance();
         cal.setTime(currentDate);
         dayPath.year = cal.get(Calendar.YEAR);
-        dayPath.month = cal.get(Calendar.MONTH)+1;
+        dayPath.month = cal.get(Calendar.MONTH);
         //http://stackoverflow.com/questions/344380/why-is-january-month-0-in-java-calendar
         dayPath.day = cal.get(Calendar.DAY_OF_MONTH);
         int number = cal.get(Calendar.DAY_OF_WEEK);
@@ -138,14 +139,16 @@ public class TodayGankActivity extends AppCompatActivity {
     private final Action1<GankDaily> dataInsert = new Action1<GankDaily>() {
         @Override
         public void call(GankDaily gankDaily) {
+            Log.e("gankDaily","not null");
             BriteDatabase.Transaction transaction = db.newTransaction();
             try{
-                db.execute("delete From "+Db.TODAY_TABLE_NAME+"where id > -1");
+                db.execute("delete From "+Db.TODAY_TABLE_NAME+" where "+ GankInfoContract.GankEntry._ID+" > -1");
                 db.insert(Db.TODAY_TABLE_NAME,new GankInfo.Builder(gankDaily.Meizi.get(0)).build());
                 List<GankInfo> infoList = GanKDailyToList(gankDaily);
                 for (GankInfo info:infoList){
                     db.insert(Db.TODAY_TABLE_NAME,new GankInfo.Builder(info).build());
                 }
+                transaction.markSuccessful();
             }finally {
                 transaction.end();
             }

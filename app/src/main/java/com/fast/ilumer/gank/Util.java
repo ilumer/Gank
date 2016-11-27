@@ -23,7 +23,7 @@ public class Util {
 
     private static SimpleDateFormat initFormat(){
         //http://stackoverflow.com/questions/8405087/what-is-this-date-format-2011-08-12t201746-384z
-        SimpleDateFormat format = new SimpleDateFormat("YYYY-MM-DDTHH:MM:SS", Locale.CHINA);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.CHINA);
         format.setTimeZone(TimeZone.getTimeZone("UTC"));
         return format;
     }

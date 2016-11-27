@@ -54,7 +54,7 @@ public class GankDaily {
             daily.Fontend = new ArrayList<>();
             daily.Recommd = new ArrayList<>();
             try {
-                while (cursor.moveToNext()) {
+                do{
                     GankInfo info = new GankInfo();
                     info.setDatebaseId(Db.getInt(cursor, GankInfoContract.GankEntry._ID));
                     info.set_id(Db.getString(cursor, GankInfoContract.GankEntry.URL_ID));
@@ -95,7 +95,7 @@ public class GankDaily {
                             break;
                         }
                     }
-                }
+                }while (cursor.moveToNext());
             }finally {
                 cursor.close();
             }
