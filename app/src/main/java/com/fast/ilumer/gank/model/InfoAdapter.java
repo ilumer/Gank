@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.fast.ilumer.gank.R;
@@ -35,15 +34,10 @@ public class InfoAdapter extends ProgressAdapter{
     void BindInfoViewHolder(GankInfo info, RecyclerView.ViewHolder holder) {
         ((InfoHolder) holder).BindModel(info);
         final String uri = info.getUrl();
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-                builder.setToolbarColor(mActivity.getResources().getColor(R.color.colorPrimaryDark));
-                CustomTabsIntent intent = builder.build();
-                intent.launchUrl(mActivity, Uri.parse(uri));
-                //customTabs的简单使用
-            }
+        holder.itemView.setOnClickListener(v -> {
+            CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+            CustomTabsIntent intent = builder.build();
+            intent.launchUrl(mActivity, Uri.parse(uri));
         });
     }
 }

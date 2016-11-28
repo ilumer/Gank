@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 
 import com.fast.ilumer.gank.R;
 import com.fast.ilumer.gank.model.GankInfo;
-import com.fast.ilumer.gank.model.GankRepositories;
 import com.fast.ilumer.gank.model.ImageAdapter;
 import com.fast.ilumer.gank.network.RetrofitHelper;
 import com.fast.ilumer.gank.recyclerview.EndlessRecyclerOnScrollListener;
@@ -23,11 +22,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import retrofit2.adapter.rxjava.Result;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -144,12 +141,7 @@ public class GankMeiZiFragment extends Fragment
      private Observable<List<GankInfo>> getReslut(int page){
         return RetrofitHelper.getInstance().getGank()
                 .GankTypeInfo("福利",number,page)
-                .map(new Func1<Result<GankRepositories<List<GankInfo>>>, List<GankInfo>>() {
-                    @Override
-                    public List<GankInfo> call(Result<GankRepositories<List<GankInfo>>> gankRepositoriesResult) {
-                        return gankRepositoriesResult.response().body().results;
-                    }
-                })
+                .map(gankRepositoriesResult -> gankRepositoriesResult.response().body().results)
                 .subscribeOn(Schedulers.io());
     }
 }

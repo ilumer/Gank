@@ -119,36 +119,32 @@ public class GankTypeFragment extends Fragment
         }
         mSwipeRefreshLayout.setRefreshing(true);
         mSubscription.add(getResult(1)
-                .filter(new Func1<List<GankInfo>, Boolean>() {
+                .filter(list -> mContentList.size() == 0 || mContentList.containsAll(list))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<GankInfo>>() {
                     @Override
-                    public Boolean call(List<GankInfo> list) {
-                        return mContentList.size()==0||mContentList.containsAll(list);
+                    public void onCompleted() {
+                        mSwipeRefreshLayout.setRefreshing(false);
                     }
-                })
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Observer<List<GankInfo>>() {
-            @Override
-            public void onCompleted() {
-                mSwipeRefreshLayout.setRefreshing(false);
-            }
-            @Override
-            public void onError(Throwable e) {
-                mSwipeRefreshLayout.setRefreshing(false);
-            }
 
-            @Override
-            public void onNext(List<GankInfo> list) {
-                if (mContentList.size()>10) {
-                    for (int i = 0; i < list.size(); i++) {
-                        mContentList.set(i, list.get(i));
+                    @Override
+                    public void onError(Throwable e) {
+                        mSwipeRefreshLayout.setRefreshing(false);
                     }
-                    mContentAdapter.notifyItemRangeChanged(0, list.size());
-                }else {
-                    mContentList.addAll(list);
-                    mContentAdapter.notifyItemRangeInserted(0,list.size());
-                }
-            }
-        }));
+
+                    @Override
+                    public void onNext(List<GankInfo> list) {
+                        if (mContentList.size() > 10) {
+                            for (int i = 0; i < list.size(); i++) {
+                                mContentList.set(i, list.get(i));
+                            }
+                            mContentAdapter.notifyItemRangeChanged(0, list.size());
+                        } else {
+                            mContentList.addAll(list);
+                            mContentAdapter.notifyItemRangeInserted(0, list.size());
+                        }
+                    }
+                }));
 
     }
     public Observable<List<GankInfo>> getResult(int page){

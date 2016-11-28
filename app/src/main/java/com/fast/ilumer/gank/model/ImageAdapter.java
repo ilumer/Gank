@@ -45,13 +45,10 @@ public class ImageAdapter extends ProgressAdapter{
                 //等同于scaletype中的center_crop
                 //按宽高部分进行缩放多余部分裁取
                 .into(((ImageViewHolder)holder).imageView);
-        ((ImageViewHolder)holder).imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(host.getActivity(), PictureActivity.class);
-                i.putExtra("uri",info.getUrl());
-                host.getActivity().startActivity(i);
-            }
+        ((ImageViewHolder)holder).imageView.setOnClickListener(v -> {
+            Intent i = new Intent(host.getActivity(), PictureActivity.class);
+            i.putExtra("uri",info.getUrl());
+            host.getActivity().startActivity(i);
         });
     }
 

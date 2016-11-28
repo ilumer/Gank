@@ -10,20 +10,14 @@ import rx.functions.Func1;
  */
 
 public final class Results {
-    private static final Func1<Result<?>,Boolean> SUCCESSFUL = new Func1<Result<?>, Boolean>() {
-        @Override
-        public Boolean call(Result<?> result) {
-            return !result.isError()&&result.response().isSuccessful();
-        }
-    };
+    private static final Func1<Result<?>,Boolean> SUCCESSFUL = (result ->
+        !result.isError()&&result.response().isSuccessful()
+    );
 
-    private static final Func1<GankDaily,Boolean> NONE = new Func1<GankDaily, Boolean>() {
-        @Override
-        public Boolean call(GankDaily gankDaily) {
-            return gankDaily.Android.size()==0&&gankDaily.iOS.size()==0;
-            //这两个标志位代表是否为空
-        }
-    };
+    private static final Func1<GankDaily,Boolean> NONE = (daily ->
+        daily.Android.size()==0&&daily.iOS.size()==0
+    );
+
     public static Func1<Result<?>,Boolean> isSuccessful(){
         return SUCCESSFUL;
     }

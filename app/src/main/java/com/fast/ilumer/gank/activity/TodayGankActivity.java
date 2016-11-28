@@ -99,12 +99,7 @@ public class TodayGankActivity extends AppCompatActivity {
 
         Observable<GankDaily> returnData = result.
                 filter(Results.isSuccessful())
-                .map(new Func1<Result<GankRepositories<GankDaily>>, GankDaily>() {
-            @Override
-            public GankDaily call(Result<GankRepositories<GankDaily>> gankRepositoriesResult) {
-                return gankRepositoriesResult.response().body().results;
-            }
-        });
+                .map(gankRepositoriesResult -> gankRepositoriesResult.response().body().results);
 
         Observable<GankDaily> postData = returnData.filter(Funcs.not(Results.isNull()));
 
@@ -112,13 +107,7 @@ public class TodayGankActivity extends AppCompatActivity {
                 .subscribe(GankTodayUpdate);
 
         subscription.add(postData
-                .filter(new Func1<GankDaily, Boolean>() {
-                    @Override
-                    public Boolean call(GankDaily daily) {
-                        return !daily.equals(temp);
-                        //同一天里两次更新数据库
-                    }
-                })
+                .filter(daily -> !daily.equals(temp))
                 .observeOn(Schedulers.io())
                 .subscribe(dataInsert));
         //由于gank的每日的更新的item不确定所以对应的id更新的数据库的想法有一点的不合实际
@@ -129,7 +118,7 @@ public class TodayGankActivity extends AppCompatActivity {
         Calendar cal = Calendar.getInstance();
         cal.setTime(currentDate);
         dayPath.year = cal.get(Calendar.YEAR);
-        dayPath.month = cal.get(Calendar.MONTH);
+        dayPath.month = cal.get(Calendar.MONTH)-1;
         //http://stackoverflow.com/questions/344380/why-is-january-month-0-in-java-calendar
         dayPath.day = cal.get(Calendar.DAY_OF_MONTH);
         int number = cal.get(Calendar.DAY_OF_WEEK);
@@ -171,7 +160,9 @@ public class TodayGankActivity extends AppCompatActivity {
             temp = gankDaily;
             if (gankDaily.Meizi.get(0)!=null){
                 Glide.with(TodayGankActivity.this)
-                        .load(gankDaily.Meizi.get(0).getUrl()).into(gril);
+                        .load(gankDaily.Meizi.get(0).getUrl())
+                        .centerCrop()
+                        .into(gril);
             }
            List<GankInfo> list = GanKDailyToList(gankDaily);
             contentList.addAll(list);
@@ -189,7 +180,10 @@ public class TodayGankActivity extends AppCompatActivity {
                 Log.e("response code",gankRepositoriesResult.response().code()+"");
                 //可以处理不同的status code
             }
-            textView.setVisibility(View.VISIBLE);
+            if (temp==null) {
+                //简单粗暴
+                textView.setVisibility(View.VISIBLE);
+            }
         }
     };
 
