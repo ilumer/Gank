@@ -20,4 +20,6 @@
     <string name="no_gank">抱歉今天还没有干货啊</string>
     <string name="update_gank">抱歉今天的干货还没有更新</string>
     <string name="error_network">检测你的网络是否出现了问题,你的干货被谁吃了</string>
+    <string name="search_hint">serach gank</string>
+    <string name="action_search">serach</string>
 </resources>

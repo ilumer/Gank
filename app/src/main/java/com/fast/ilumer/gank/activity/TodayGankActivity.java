@@ -118,7 +118,7 @@ public class TodayGankActivity extends AppCompatActivity {
         Calendar cal = Calendar.getInstance();
         cal.setTime(currentDate);
         dayPath.year = cal.get(Calendar.YEAR);
-        dayPath.month = cal.get(Calendar.MONTH)-1;
+        dayPath.month = cal.get(Calendar.MONTH)+1;
         //http://stackoverflow.com/questions/344380/why-is-january-month-0-in-java-calendar
         dayPath.day = cal.get(Calendar.DAY_OF_MONTH);
         int number = cal.get(Calendar.DAY_OF_WEEK);

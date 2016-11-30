@@ -1,5 +1,8 @@
 package com.fast.ilumer.gank;
 
+import android.app.SearchManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -8,11 +11,13 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.fast.ilumer.gank.activity.SearchResultActivity;
 import com.fast.ilumer.gank.activity.TodayGankActivity;
 import com.fast.ilumer.gank.fragment.GankMeiZiFragment;
 import com.fast.ilumer.gank.fragment.GankTypeFragment;
@@ -57,6 +62,12 @@ public class MainActivity extends AppCompatActivity{
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu,menu);
+        MenuItem searchitem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchitem.getActionView();
+        SearchManager manager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView.setSearchableInfo(manager.getSearchableInfo(
+                new ComponentName(MainActivity.this, SearchResultActivity.class)));
+        //http://stackoverflow.com/questions/29540724/start-new-activity-from-searchview
         return true;
     }
 
@@ -72,6 +83,8 @@ public class MainActivity extends AppCompatActivity{
             case R.id.setting:{
                 return true;
             }
+
+
             default:
             return super.onOptionsItemSelected(item);
         }
