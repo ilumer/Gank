@@ -104,7 +104,7 @@ public class TodayGankActivity extends AppCompatActivity {
         Observable<GankDaily> postData = returnData.filter(Funcs.not(Results.isNull()));
 
         returnData.filter(Results.isNull())
-                .subscribe(GankTodayUpdate);
+                .subscribe(gankTodayNotUpdate);
 
         subscription.add(postData
                 .filter(daily -> !daily.equals(temp))
@@ -187,7 +187,7 @@ public class TodayGankActivity extends AppCompatActivity {
         }
     };
 
-    private final Action1<GankDaily> GankTodayUpdate = new Action1<GankDaily>() {
+    private final Action1<GankDaily> gankTodayNotUpdate = new Action1<GankDaily>() {
         @Override
         public void call(GankDaily gankDaily) {
 

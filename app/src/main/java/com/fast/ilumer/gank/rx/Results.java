@@ -15,7 +15,7 @@ public final class Results {
     );
 
     private static final Func1<GankDaily,Boolean> NONE = (daily ->
-        daily.Android.size()==0&&daily.iOS.size()==0
+        daily.Android==null||daily.Android.size()==0&&daily.iOS.size()==0
     );
 
     public static Func1<Result<?>,Boolean> isSuccessful(){
