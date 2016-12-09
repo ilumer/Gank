@@ -3,6 +3,7 @@ package com.fast.ilumer.gank;
 import android.app.Application;
 import android.content.Context;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.stetho.Stetho;
 
 /**
@@ -17,6 +18,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         Stetho.initializeWithDefaults(this);
+        Fresco.initialize(this);
         context = getApplicationContext();
     }
 

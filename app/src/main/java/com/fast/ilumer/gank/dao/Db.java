@@ -4,7 +4,7 @@ import android.database.Cursor;
 
 /**
  * Created by root on 11/26/16.
- * copy from sqlbrite sqmple
+ * copy from sqlbrite sample
  */
 
 public final class Db {

@@ -165,8 +165,9 @@ public class TodayGankActivity extends AppCompatActivity {
                         .into(gril);
             }
            List<GankInfo> list = GanKDailyToList(gankDaily);
+            contentList.clear();
             contentList.addAll(list);
-            adapter.notifyItemRangeInserted(0,list.size());
+            adapter.notifyDataSetChanged();
         }
     };
 

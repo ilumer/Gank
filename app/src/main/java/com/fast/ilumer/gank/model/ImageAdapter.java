@@ -7,10 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.Glide;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.fast.ilumer.gank.R;
 import com.fast.ilumer.gank.activity.PictureActivity;
-import com.fast.ilumer.gank.widget.RatioImageView;
 
 import java.util.List;
 
@@ -39,12 +38,8 @@ public class ImageAdapter extends ProgressAdapter{
 
     @Override
     void BindInfoViewHolder(final GankInfo info, RecyclerView.ViewHolder holder) {
-        Glide.with(host)
-                .load(info.getUrl())
-                .centerCrop()
-                //等同于scaletype中的center_crop
-                //按宽高部分进行缩放多余部分裁取
-                .into(((ImageViewHolder)holder).imageView);
+        ((ImageViewHolder)holder).imageView.
+                setImageURI(info.getUrl());
         ((ImageViewHolder)holder).imageView.setOnClickListener(v -> {
             Intent i = new Intent(host.getActivity(), PictureActivity.class);
             i.putExtra("uri",info.getUrl());
@@ -54,11 +49,10 @@ public class ImageAdapter extends ProgressAdapter{
 
     static class ImageViewHolder extends RecyclerView.ViewHolder{
         @BindView(R.id.gril)
-        RatioImageView imageView;
+        SimpleDraweeView imageView;
         public ImageViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);
-            imageView.setRatio(0.618f);
         }
     }
 }

@@ -3,9 +3,8 @@ package com.fast.ilumer.gank.activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.fast.ilumer.gank.R;
 
 import butterknife.BindView;
@@ -14,8 +13,9 @@ import butterknife.ButterKnife;
 public class PictureActivity extends AppCompatActivity {
 
     @BindView(R.id.gril)
-    ImageView gril;
+    SimpleDraweeView gril;
     @BindView(R.id.toolbar)
+
     Toolbar mtoolbar;
     String uri;
 
@@ -32,9 +32,6 @@ public class PictureActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Glide.with(this)
-                .load(uri)
-                .centerCrop()
-                .into(gril);
+        gril.setImageURI(uri);
     }
 }

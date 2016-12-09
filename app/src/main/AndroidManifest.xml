@@ -23,7 +23,7 @@
         </activity>
         <activity android:name=".BaseActivity" />
         <activity android:name=".activity.PictureActivity" />
-        <activity android:name=".activity.TodayGankActivity" />079-1100
+        <activity android:name=".activity.TodayGankActivity" />
         <activity android:name=".activity.SearchResultActivity"
             android:launchMode="singleTop">
             <intent-filter>
