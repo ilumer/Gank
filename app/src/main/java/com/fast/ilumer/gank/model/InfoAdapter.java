@@ -27,17 +27,18 @@ public class InfoAdapter extends ProgressAdapter{
 
     @Override
     RecyclerView.ViewHolder getInfoViewHolder(ViewGroup parent) {
-        return new InfoHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.ganktypeinfo_item, parent, false));
+        return new InfoHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.info_viewholder, parent, false));
     }
 
     @Override
     void BindInfoViewHolder(GankInfo info, RecyclerView.ViewHolder holder) {
-        ((InfoHolder) holder).BindModel(info);
+        ((InfoHolder) holder).bindModel(info,mActivity);
         final String uri = info.getUrl();
-        holder.itemView.setOnClickListener(v -> {
+        ((InfoHolder) holder).bottomBackground.setOnClickListener(v -> {
             CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
             CustomTabsIntent intent = builder.build();
             intent.launchUrl(mActivity, Uri.parse(uri));
         });
+        //http://stackoverflow.com/questions/10243690/onclick-on-viewpager-not-triggered
     }
 }

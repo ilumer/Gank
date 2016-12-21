@@ -148,7 +148,10 @@ public class GankTypeFragment extends Fragment
 
     }
     public Observable<List<GankInfo>> getResult(int page){
-        return RetrofitHelper.getInstance().getGank().GankTypeInfo(type,number,page)
+        return RetrofitHelper
+                .getInstance()
+                .getGank()
+                .GankTypeInfo(type,number,page)
                 .filter(Results.isSuccessful())
                 .map(new Func1<Result<GankRepositories<List<GankInfo>>>, List<GankInfo>>() {
                     @Override

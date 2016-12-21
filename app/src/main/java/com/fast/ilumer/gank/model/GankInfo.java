@@ -6,6 +6,7 @@ import com.fast.ilumer.gank.Util;
 import com.fast.ilumer.gank.dao.GankInfoContract;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by root on 10/15/16.
@@ -23,6 +24,7 @@ public class GankInfo {
     private String desc;
     private String type;
     private boolean used;
+    private List<String> images;
 
     public static class Builder{
         ContentValues values = new ContentValues();
@@ -116,6 +118,14 @@ public class GankInfo {
 
     public void set_id(String _id) {
         this._id = _id;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 
     @Override
