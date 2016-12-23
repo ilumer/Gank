@@ -32,7 +32,7 @@ public class InfoAdapter extends ProgressAdapter{
 
     @Override
     void BindInfoViewHolder(GankInfo info, RecyclerView.ViewHolder holder) {
-        ((InfoHolder) holder).bindModel(info,mActivity);
+        ((InfoHolder) holder).bindModel(info);
         final String uri = info.getUrl();
         ((InfoHolder) holder).bottomBackground.setOnClickListener(v -> {
             CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();

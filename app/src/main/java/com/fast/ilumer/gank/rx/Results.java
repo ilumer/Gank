@@ -15,8 +15,12 @@ public final class Results {
     );
 
     private static final Func1<GankDaily,Boolean> NONE = (daily ->
-        daily.Android==null||daily.Android.size()==0&&daily.iOS.size()==0
+        daily.Android==null||daily.Android.isEmpty()&&daily.iOS.isEmpty()
     );
+
+    private Results(){
+        throw new AssertionError("error");
+    }
 
     public static Func1<Result<?>,Boolean> isSuccessful(){
         return SUCCESSFUL;
@@ -24,9 +28,5 @@ public final class Results {
 
     public static Func1<GankDaily,Boolean> isNull(){
         return NONE;
-    }
-
-    private Results(){
-        throw new AssertionError("error");
     }
 }

@@ -118,7 +118,7 @@ public abstract class ProgressAdapter extends
     }
 
     private void bindProgress(ProgressViewHolder viewHolder){
-        viewHolder.progressBar.setVisibility((isLoadingMore?View.VISIBLE:View.INVISIBLE));
+        viewHolder.progressBar.setVisibility(isLoadingMore?View.VISIBLE:View.INVISIBLE);
     }
 
     static class ProgressViewHolder extends RecyclerView.ViewHolder{

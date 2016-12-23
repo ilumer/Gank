@@ -9,41 +9,51 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"/>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/bottom_background"
         android:layout_width="match_parent"
         android:orientation="vertical"
-        android:layout_height="50dp"
+        android:layout_height="64dp"
         android:layout_gravity="bottom">
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/description"
+            android:layout_margin="8dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="1"/>
-        <LinearLayout
+            android:textSize="16sp"/>
+        <RelativeLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="20dp">
+            android:layout_height="32dp"
+            android:layout_alignParentBottom="true">
 
             <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/recommender"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:textSize="12sp"
+                android:layout_alignParentStart="true"/>
 
             <com.rd.PageIndicatorView
                 android:id="@+id/pageIndicatorView"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                attrs:piv_radius="12dp"
-                attrs:piv_padding="24dp"
+                android:layout_centerInParent="true"
+                android:layout_margin="8dp"
+                attrs:piv_radius="6dp"
+                attrs:piv_padding="12dp"
                 attrs:piv_animationType="thinWorm"
                 attrs:piv_interactiveAnimation="true" />
 
             <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/publishdate"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:textSize="12sp"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
 
-    </LinearLayout>
+    </RelativeLayout>
 </FrameLayout>
