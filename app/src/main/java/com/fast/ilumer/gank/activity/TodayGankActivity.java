@@ -1,17 +1,14 @@
 package com.fast.ilumer.gank.activity;
 
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.fast.ilumer.gank.R;
 import com.fast.ilumer.gank.dao.Db;
 import com.fast.ilumer.gank.dao.DbOpenHelper;
@@ -24,7 +21,6 @@ import com.fast.ilumer.gank.model.GankRepositories;
 import com.fast.ilumer.gank.network.RetrofitHelper;
 import com.fast.ilumer.gank.rx.Funcs;
 import com.fast.ilumer.gank.rx.Results;
-import com.fast.ilumer.gank.widget.RatioImageView;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 
@@ -49,14 +45,11 @@ public class TodayGankActivity extends AppCompatActivity {
     private CompositeSubscription subscription;
     private GankDailyAdapter adapter;
     private LinearLayoutManager linearlayoutManager;
-    private BottomSheetBehavior behavior;
     private List<GankInfo> contentList = new ArrayList<>();
     private  boolean hasGank ;
     private SqlBrite sqlBrite = new SqlBrite.Builder().build();
     private BriteDatabase db ;
     private GankDaily temp;
-    @BindView(R.id.gril)
-    ImageView gril;
     @BindView(R.id.content)
     RecyclerView content;
     @BindView(R.id.toolbar)
@@ -72,10 +65,8 @@ public class TodayGankActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_today_gank);
         unbinder = ButterKnife.bind(this);
-        ((RatioImageView) gril).setRatio(0.818f);
         db = sqlBrite.wrapDatabaseHelper(new DbOpenHelper(this),Schedulers.io());
         setSupportActionBar(toolbar);
-        behavior = BottomSheetBehavior.from(content);
         initDayPath();
         subscription = new CompositeSubscription();
         adapter = new GankDailyAdapter(contentList,this);
@@ -158,13 +149,7 @@ public class TodayGankActivity extends AppCompatActivity {
         @Override
         public void call(GankDaily gankDaily) {
             temp = gankDaily;
-            if (gankDaily.Meizi.get(0)!=null){
-                Glide.with(TodayGankActivity.this)
-                        .load(gankDaily.Meizi.get(0).getUrl())
-                        .centerCrop()
-                        .into(gril);
-            }
-           List<GankInfo> list = GanKDailyToList(gankDaily);
+            List<GankInfo> list = GanKDailyToList(gankDaily);
             contentList.clear();
             contentList.addAll(list);
             adapter.notifyDataSetChanged();
@@ -211,6 +196,9 @@ public class TodayGankActivity extends AppCompatActivity {
 
     private List<GankInfo> GanKDailyToList(GankDaily daily){
         List<GankInfo> list = new ArrayList<>();
+        if (daily.Meizi!=null){
+            list.addAll(daily.Meizi);
+        }
         if (daily.Android!=null){
             list.addAll(daily.Android);
         }

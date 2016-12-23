@@ -18,17 +18,17 @@ import java.util.List;
  *
  */
 
-public class ImagePageAdapter extends PagerAdapter {
+public class PicPagerAdapter extends PagerAdapter {
 
     private List<String> imageList;
 
-    public ImagePageAdapter(List<String> imageList) {
+    public PicPagerAdapter(List<String> imageList) {
         this.imageList=imageList;
     }
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        View view = LayoutInflater.from(container.getContext()).inflate(R.layout.image_holder,container,false);
+        View view = LayoutInflater.from(container.getContext()).inflate(R.layout.gank_info_pic,container,false);
         Uri uri = Uri.parse(imageList.get(position));
         DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setUri(uri)

@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 
 import com.fast.ilumer.gank.R;
 import com.fast.ilumer.gank.model.GankInfo;
-import com.fast.ilumer.gank.model.ImageAdapter;
+import com.fast.ilumer.gank.model.GirlAdapter;
 import com.fast.ilumer.gank.network.RetrofitHelper;
 import com.fast.ilumer.gank.recyclerview.EndlessRecyclerOnScrollListener;
 
@@ -43,7 +43,7 @@ public class GankMeiZiFragment extends Fragment
     SwipeRefreshLayout mSwipeRefreshLayout;
     List<GankInfo> mContentList = new ArrayList<>();
     int number =10;
-    ImageAdapter adapter;
+    GirlAdapter adapter;
     GridLayoutManager manager ;
     CompositeSubscription subscription;
 
@@ -64,16 +64,16 @@ public class GankMeiZiFragment extends Fragment
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        adapter = new ImageAdapter(mContentList,this);
+        adapter = new GirlAdapter(mContentList,this);
         manager = new GridLayoutManager(getActivity(),2);
         manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
                 switch (adapter.getItemViewType(position)){
-                    case ImageAdapter.VIEW_TYPE_LOADING:{
+                    case GirlAdapter.VIEW_TYPE_LOADING:{
                         return 2;
                     }
-                    case ImageAdapter.VIEW_TYPE_INFO:{
+                    case GirlAdapter.VIEW_TYPE_INFO:{
                         return 1;
                     }
                     default:

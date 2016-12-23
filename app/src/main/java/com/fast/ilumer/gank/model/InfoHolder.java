@@ -99,7 +99,7 @@ public class InfoHolder extends RecyclerView.ViewHolder {
 
     private void haveImageState(GankInfo gankInfo){
         imageViewPager.setVisibility(View.VISIBLE);
-        imageViewPager.setAdapter(new ImagePageAdapter(gankInfo.getImages()));
+        imageViewPager.setAdapter(new PicPagerAdapter(gankInfo.getImages()));
 
         mPublishDate.setTextColor(whiteColor);
         mDesc.setTextColor(whiteColor);

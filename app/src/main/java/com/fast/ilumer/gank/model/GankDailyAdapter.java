@@ -24,10 +24,11 @@ import butterknife.ButterKnife;
  *
  */
 
-public class GankDailyAdapter extends RecyclerView.Adapter<GankDailyAdapter.DaliyHolder>{
+public class GankDailyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private static final int TYPE_COMMON_NEWS = 0;
     private static final int TYPE_COMMON_TITLE_NEWS = 1;
+    private static final int TYPE_HEADER_VIEW= 2;
 
 
     private List<GankInfo> list;
@@ -38,22 +39,33 @@ public class GankDailyAdapter extends RecyclerView.Adapter<GankDailyAdapter.Dali
     }
 
     @Override
-    public DaliyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.gankdaily_item, parent, false);
-        return new DaliyHolder(view);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        if (viewType!=TYPE_HEADER_VIEW) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.gank_daily_info, parent, false);
+            return new DaliyHolder(view);
+        }else {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.gank_girl_pic,parent,false);
+            return new GirlHolder(view);
+        }
     }
 
     @Override
-    public void onBindViewHolder(DaliyHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         GankInfo info = list.get(position);
         switch (getItemViewType(position)){
             case TYPE_COMMON_TITLE_NEWS: {
-                holder.bind(info, true,host);
+                ((DaliyHolder)holder).bind(info, true,host);
                 break;
             }
             case TYPE_COMMON_NEWS:{
-                holder.bind(info,false,host);
+                ((DaliyHolder)holder).bind(info,false,host);
+                break;
+            }
+            case TYPE_HEADER_VIEW:{
+                ((GirlHolder)holder).imageView.setAspectRatio(1.2f);
+                ((GirlHolder)holder).imageView.setImageURI(info.getUrl());
                 break;
             }
         }
@@ -76,8 +88,8 @@ public class GankDailyAdapter extends RecyclerView.Adapter<GankDailyAdapter.Dali
     @Override
     public int getItemViewType(int position) {
         if (position==0){
-            return TYPE_COMMON_TITLE_NEWS;
-        }else if (compareType(position-1,position)){
+            return TYPE_HEADER_VIEW;
+        } else if (compareType(position-1,position)){
             return TYPE_COMMON_TITLE_NEWS;
         }
         else {

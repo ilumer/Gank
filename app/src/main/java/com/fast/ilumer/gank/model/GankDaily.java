@@ -15,6 +15,7 @@ import rx.functions.Func1;
 /**
  * Created by root on 10/16/16.
  * gank daily model
+ * 变量命名的(O_O)？不想改Android
  */
 
 public class GankDaily {
