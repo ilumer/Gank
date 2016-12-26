@@ -28,7 +28,7 @@ public class PicPagerAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        View view = LayoutInflater.from(container.getContext()).inflate(R.layout.gank_info_pic,container,false);
+        View view = LayoutInflater.from(container.getContext()).inflate(R.layout.gank_pager_pic,container,false);
         Uri uri = Uri.parse(imageList.get(position));
         DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setUri(uri)

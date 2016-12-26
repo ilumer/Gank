@@ -70,10 +70,10 @@ public class GankMeiZiFragment extends Fragment
             @Override
             public int getSpanSize(int position) {
                 switch (adapter.getItemViewType(position)){
-                    case GirlAdapter.VIEW_TYPE_LOADING:{
+                    case GirlAdapter.GANK_VIEW_LOADING:{
                         return 2;
                     }
-                    case GirlAdapter.VIEW_TYPE_INFO:{
+                    case GirlAdapter.GANK_VIEW_GIRL:{
                         return 1;
                     }
                     default:
@@ -86,8 +86,7 @@ public class GankMeiZiFragment extends Fragment
         content.addOnScrollListener(new EndlessRecyclerOnScrollListener(manager) {
             @Override
             public void onLoadMore(int page) {
-                getReslut(page)
-                        .doOnSubscribe(adapter)
+                getReslut(page).doOnSubscribe(adapter)
                         .subscribeOn(AndroidSchedulers.mainThread())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(adapter);
@@ -140,7 +139,7 @@ public class GankMeiZiFragment extends Fragment
 
      private Observable<List<GankInfo>> getReslut(int page){
         return RetrofitHelper.getInstance().getGank()
-                .GankTypeInfo("福利",number,page)
+                .gankTypeInfo("福利",number,page)
                 .map(gankRepositoriesResult -> gankRepositoriesResult.response().body().results)
                 .subscribeOn(Schedulers.io());
     }

@@ -151,7 +151,7 @@ public class GankTypeFragment extends Fragment
         return RetrofitHelper
                 .getInstance()
                 .getGank()
-                .GankTypeInfo(type,number,page)
+                .gankTypeInfo(type,number,page)
                 .filter(Results.isSuccessful())
                 .map(new Func1<Result<GankRepositories<List<GankInfo>>>, List<GankInfo>>() {
                     @Override

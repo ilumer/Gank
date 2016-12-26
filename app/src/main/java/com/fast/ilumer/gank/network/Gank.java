@@ -18,10 +18,10 @@ import rx.Observable;
 
 public interface Gank {
     @GET("day/{year}/{month}/{day}")
-    Observable<Result<GankRepositories<GankDaily>>> GankDailyInfo(@Path("year") int year, @Path("month") int month, @Path("day") int day);
+    Observable<Result<GankRepositories<GankDaily>>> gankDailyInfo(@Path("year") int year, @Path("month") int month, @Path("day") int day);
 
     @GET("data/{type}/{number}/{page}")
-    Observable<Result<GankRepositories<List<GankInfo>>>> GankTypeInfo(@Path("type") String type, @Path("number") int number, @Path("page") int page);
+    Observable<Result<GankRepositories<List<GankInfo>>>> gankTypeInfo(@Path("type") String type, @Path("number") int number, @Path("page") int page);
 
 
 }

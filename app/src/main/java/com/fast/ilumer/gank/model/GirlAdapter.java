@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import com.fast.ilumer.gank.R;
 import com.fast.ilumer.gank.activity.PictureActivity;
+import com.fast.ilumer.gank.model.viewholder.GirlHolder;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ import java.util.List;
  */
 
 public class GirlAdapter extends ProgressAdapter{
-
+    public static final int GANK_VIEW_GIRL = 1;
     private Fragment host;
 
     public GirlAdapter(List<GankInfo> mContentList, Fragment fragment) {
@@ -26,17 +27,20 @@ public class GirlAdapter extends ProgressAdapter{
     }
 
     @Override
-    RecyclerView.ViewHolder getInfoViewHolder(ViewGroup parent) {
-        return new GirlHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.gank_girl_pic,parent,false));
+    public int getItemViewTypeExt(int position) {
+        return GANK_VIEW_GIRL;
     }
 
     @Override
-    void BindInfoViewHolder(final GankInfo info, RecyclerView.ViewHolder holder) {
-        ((GirlHolder)holder).imageView.setAspectRatio(0.618f);
-        ((GirlHolder)holder).imageView.
-                setImageURI(info.getUrl());
-        ((GirlHolder)holder).imageView.setOnClickListener(v -> {
+    public RecyclerView.ViewHolder onCreateExtViewHolder(ViewGroup parent, int viewType) {
+        return new GirlHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.gank_girl_pic,parent,false));
+    }
+
+    @Override
+    public void onBindExtViewHolder(RecyclerView.ViewHolder holder, GankInfo info) {
+        ((GirlHolder)holder).setAspectRatio(0.618f);
+        ((GirlHolder)holder).bindModel(info);
+        ((GirlHolder)holder).imageView.setOnClickListener(v->{
             Intent i = new Intent(host.getActivity(), PictureActivity.class);
             i.putExtra("uri",info.getUrl());
             host.getActivity().startActivity(i);

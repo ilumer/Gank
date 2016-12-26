@@ -1,21 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Gank.Theme.NoActionBar" parent="Theme.AppCompat.NoActionBar">
+    <style name="Gank.Theme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:listDivider">@drawable/divider</item>
     </style>
-
-    <style name="Base.Gank.Theme" parent="Theme.AppCompat.NoActionBar">
-        <!-- Customize your theme here. -->
-
-    </style>
-    
-    <style name="ToolbarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-    </style>
-
 
 </resources>

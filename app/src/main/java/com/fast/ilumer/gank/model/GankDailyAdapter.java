@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.fast.ilumer.gank.R;
+import com.fast.ilumer.gank.model.viewholder.GirlHolder;
 
 import java.util.List;
 
@@ -64,8 +65,8 @@ public class GankDailyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 break;
             }
             case TYPE_HEADER_VIEW:{
-                ((GirlHolder)holder).imageView.setAspectRatio(1.2f);
-                ((GirlHolder)holder).imageView.setImageURI(info.getUrl());
+                ((GirlHolder)holder).setAspectRatio(1.2f);
+                ((GirlHolder)holder).bindModel(info);
                 break;
             }
         }

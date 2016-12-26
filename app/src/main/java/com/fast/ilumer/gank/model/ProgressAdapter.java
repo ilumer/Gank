@@ -24,8 +24,7 @@ import rx.functions.Action0;
 public abstract class ProgressAdapter extends
         RecyclerView.Adapter<RecyclerView.ViewHolder> implements Action0, Observer<List<GankInfo>>{
 
-    public static final int VIEW_TYPE_LOADING = 0;
-    public static final int VIEW_TYPE_INFO =1;
+    public static final int GANK_VIEW_LOADING = 0;
     private boolean isLoadingMore = false;
 
     private List<GankInfo> mContentList;
@@ -76,35 +75,28 @@ public abstract class ProgressAdapter extends
         return getDataCount()+(isLoadingMore?1:0);
     }
 
-    private int getDataCount(){
+    public int getDataCount(){
         return mContentList.size();
     }
 
-    abstract RecyclerView.ViewHolder getInfoViewHolder(ViewGroup parent);
-
-    abstract void BindInfoViewHolder(GankInfo info, RecyclerView.ViewHolder holder);
-
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType==VIEW_TYPE_LOADING){
-            return new ProgressViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.preogress_viewholder,parent,false));
+        if (viewType== GANK_VIEW_LOADING){
+            return new ProgressViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.gank_progressbar,parent,false));
         }else {
-            return getInfoViewHolder(parent);
+            return onCreateExtViewHolder(parent, viewType);
         }
-        //这里只有两个itemViewHolder
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         switch (getItemViewType(position)){
-            case VIEW_TYPE_LOADING:{
+            case GANK_VIEW_LOADING:{
                 bindProgress((ProgressViewHolder) holder);
                 break;
             }
-            case VIEW_TYPE_INFO:{
-                GankInfo info = mContentList.get(position);
-                BindInfoViewHolder(info,holder);
-                break;
+            default: {
+                onBindExtViewHolder(holder,mContentList.get(position));
             }
         }
     }
@@ -112,14 +104,26 @@ public abstract class ProgressAdapter extends
     @Override
     public int getItemViewType(int position) {
         if (getDataCount()>0&&position< getDataCount()){
-            return VIEW_TYPE_INFO;
+            return getItemViewTypeExt(position);
         }
-        return VIEW_TYPE_LOADING;
+        return GANK_VIEW_LOADING;
     }
 
     private void bindProgress(ProgressViewHolder viewHolder){
         viewHolder.progressBar.setVisibility(isLoadingMore?View.VISIBLE:View.INVISIBLE);
     }
+
+    protected List<GankInfo> getmContent(){
+        return mContentList;
+    }
+
+    protected void setmContent(List<GankInfo> mContentList){
+        this.mContentList =mContentList;
+    }
+
+    public abstract int getItemViewTypeExt(int position);
+    public abstract RecyclerView.ViewHolder onCreateExtViewHolder(ViewGroup parent, int viewType);
+    public abstract void onBindExtViewHolder(RecyclerView.ViewHolder holder, GankInfo info);
 
     static class ProgressViewHolder extends RecyclerView.ViewHolder{
         @BindView(R.id.loading)
