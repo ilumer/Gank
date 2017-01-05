@@ -1,6 +1,5 @@
 package com.fast.ilumer.gank.model.viewholder;
 
-import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -22,7 +21,7 @@ import static com.fast.ilumer.gank.R.id.pageIndicatorView;
  */
 
 public class InfoAllHolder extends InfoPicHolder {
-    @Nullable@BindView(pageIndicatorView)
+    @BindView(pageIndicatorView)
     PageIndicatorView mIndicatorView;
     Subscription subscription;
 
@@ -51,11 +50,23 @@ public class InfoAllHolder extends InfoPicHolder {
         }));
         mIndicatorView.setViewPager(picViewPager);
         mIndicatorView.setCount(picViewPager.getAdapter().getCount());
+        mIndicatorView.setSelection(picViewPager.getCurrentItem());
+    }
+
+    @Override
+    public void onAttach() {
+        super.onAttach();
         startPlay();
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        stopPlay();
+    }
+
     private void stopPlay(){
-        if (subscription!=null&&!subscription.isUnsubscribed()) {
+        if (!subscription.isUnsubscribed()) {
             subscription.unsubscribe();
         }
     }
@@ -63,7 +74,6 @@ public class InfoAllHolder extends InfoPicHolder {
     private void startPlay(){
         subscription = Observable.interval(3, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(AndroidSchedulers.mainThread())
                 .subscribe(aLong -> {
                     int currentPosition = picViewPager.getCurrentItem();
                     currentPosition++;

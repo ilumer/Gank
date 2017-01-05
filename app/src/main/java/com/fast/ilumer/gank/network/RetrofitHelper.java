@@ -18,7 +18,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class RetrofitHelper {
-    private volatile static RetrofitHelper helper=null;
     private OkHttpClient client;
     private Retrofit retrofit;
 
@@ -33,14 +32,7 @@ public class RetrofitHelper {
     }
 
     public static RetrofitHelper getInstance(){
-        if (helper==null){
-            synchronized (RetrofitHelper.class){
-                if (helper==null){
-                    helper = new RetrofitHelper();
-                }
-            }
-        }
-        return helper;
+        return LazyHelper.INSTANCE;
     }
 
     public  Gank getGank(){
@@ -57,6 +49,10 @@ public class RetrofitHelper {
                 .addNetworkInterceptor(new StethoInterceptor())
                 .addInterceptor(interceptor)
                 .build();
+    }
+
+    private static class LazyHelper{
+        private static final RetrofitHelper INSTANCE = new RetrofitHelper();
     }
 
 

@@ -21,7 +21,6 @@
                 android:name="android.app.default_searchable"
                 android:value=".SearchResultActivity"/>
         </activity>
-        <activity android:name=".BaseActivity" />
         <activity android:name=".activity.PictureActivity" />
         <activity android:name=".activity.TodayGankActivity" />
         <activity android:name=".activity.SearchResultActivity"

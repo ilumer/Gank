@@ -1,17 +1,13 @@
 package com.fast.ilumer.gank.activity;
 
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
 
-import com.fast.ilumer.gank.R;
+import com.fast.ilumer.gank.fragment.GankTypeFragment;
 
-public class SearchResultActivity extends AppCompatActivity {
+public class SearchResultActivity extends BaseActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_serach);
+    public Fragment createNewFragment() {
+        return GankTypeFragment.newInstance("福利");
     }
-
-
 }

@@ -64,4 +64,20 @@ public class InfoAdapter extends ProgressAdapter{
             intent.launchUrl(mActivity, Uri.parse(info.getUrl()));
         });
     }
+
+    @Override
+    public void onViewAttachedToWindow(RecyclerView.ViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        if (holder instanceof InfoHolder) {
+            ((InfoHolder) holder).onAttach();
+        }
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        if (holder instanceof InfoHolder) {
+            ((InfoHolder) holder).onDetach();
+        }
+    }
 }

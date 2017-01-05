@@ -45,6 +45,14 @@ public class InfoHolder extends BaseHolder{
         mPublishDate.setText(formatDate(info.getPublishedAt()));
     }
 
+    public void onAttach(){
+
+    }
+
+    public void onDetach(){
+
+    }
+
     private static CharSequence formatDate(Date date){
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
         return dateFormat.format(date);
