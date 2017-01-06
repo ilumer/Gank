@@ -30,7 +30,6 @@ public class GankTypeFragment extends RecyclerViewFragment{
         return new InfoAdapter(mContentList,getActivity());
     }
 
-    @Override
     protected RecyclerView.LayoutManager getLayoutManager() {
         return new LinearLayoutManager(getActivity());
     }
