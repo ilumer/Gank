@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -90,7 +90,9 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-    public static class ViewPageAdapter extends FragmentStatePagerAdapter {
+    public static class ViewPageAdapter extends FragmentPagerAdapter {
+        //不同的viewpager的adapter的区别
+        //http://stackoverflow.com/questions/18747975/difference-between-fragmentpageradapter-and-fragmentstatepageradapter
         private final String[] titles;
 
         private ViewPageAdapter(FragmentManager fm, String[] titles) {

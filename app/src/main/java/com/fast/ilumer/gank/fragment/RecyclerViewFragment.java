@@ -61,12 +61,12 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
             }
         });
         mSwipeRefreshLayout.setOnRefreshListener(this);
+        onRefresh();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        onRefresh();
     }
 
     @Override
