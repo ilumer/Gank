@@ -17,8 +17,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.fast.ilumer.gank.activity.GankTodayActivity;
 import com.fast.ilumer.gank.activity.SearchResultActivity;
-import com.fast.ilumer.gank.activity.TodayGankActivity;
 import com.fast.ilumer.gank.fragment.GankMeiZiFragment;
 import com.fast.ilumer.gank.fragment.GankTypeFragment;
 
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.today_gank:{
-                Intent i = new Intent(this, TodayGankActivity.class);
+                Intent i = new Intent(this, GankTodayActivity.class);
                 startActivity(i);
                 return true;
             }
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity{
                 case 5:
                     return GankTypeFragment.newInstance(titles[5]);
                 case 6:
-                    return new GankMeiZiFragment();
+                    return GankMeiZiFragment.newInstance(titles[6]);
                 case 7:
                     return GankTypeFragment.newInstance(titles[7]);
                 default:

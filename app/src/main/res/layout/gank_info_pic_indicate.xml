@@ -46,7 +46,7 @@
                 android:layout_width="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_margin="8dp"
-                attrs:piv_radius="6dp"
+                attrs:piv_radius="2dp"
                 attrs:piv_padding="12dp"
                 attrs:piv_animationType="thinWorm"
                 attrs:piv_interactiveAnimation="true" />

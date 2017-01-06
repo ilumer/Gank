@@ -5,7 +5,7 @@
     android:id="@+id/activity_today_gank"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.fast.ilumer.gank.activity.TodayGankActivity">
+    tools:context="com.fast.ilumer.gank.activity.GankTodayActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
