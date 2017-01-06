@@ -30,4 +30,10 @@ public abstract class BaseFragment extends Fragment {
     protected Unbinder getUnbinder(){
         return this.unbinder;
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
 }

@@ -35,11 +35,11 @@ public class RetrofitHelper {
         return LazyHelper.INSTANCE;
     }
 
-    public  Gank getGank(){
+    public Gank getGank(){
         return retrofit.create(Gank.class);
     }
 
-    public  void initClient(){
+    private void initClient(){
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         int cacheSize = 10*10*1024;

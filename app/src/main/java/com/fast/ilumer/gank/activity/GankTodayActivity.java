@@ -40,7 +40,7 @@ import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-public class TodayGankActivity extends AppCompatActivity {
+public class GankTodayActivity extends AppCompatActivity {
 
     private CompositeSubscription subscription;
     private GankDailyAdapter adapter;

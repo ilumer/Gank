@@ -22,7 +22,7 @@
                 android:value=".SearchResultActivity"/>
         </activity>
         <activity android:name=".activity.PictureActivity" />
-        <activity android:name=".activity.TodayGankActivity" />
+        <activity android:name=".activity.GankTodayActivity" />
         <activity android:name=".activity.SearchResultActivity"
             android:launchMode="singleTop">
             <intent-filter>

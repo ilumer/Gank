@@ -20,7 +20,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
             +GankInfoContract.GankEntry.URL_ID+" TEXT , "
             +GankInfoContract.GankEntry.URL + " TEXT , "
             +GankInfoContract.GankEntry.CREATED_AT +" TEXT ,"
-            +GankInfoContract.GankEntry.PUBLISHRD_AT+" TEXT, "
+            +GankInfoContract.GankEntry.PUBLISHRD_AT+" TEXT ,"
             +GankInfoContract.GankEntry.DESC +" TEXT, "
             +GankInfoContract.GankEntry.WHO +" TEXT, "
             + GankInfoContract.GankEntry.USED+" Interger, "

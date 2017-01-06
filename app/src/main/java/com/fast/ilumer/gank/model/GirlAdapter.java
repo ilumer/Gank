@@ -1,7 +1,7 @@
 package com.fast.ilumer.gank.model;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -19,11 +19,11 @@ import java.util.List;
 
 public class GirlAdapter extends ProgressAdapter{
     public static final int GANK_VIEW_GIRL = 1;
-    private Fragment host;
+    private Activity host;
 
-    public GirlAdapter(List<GankInfo> mContentList, Fragment fragment) {
+    public GirlAdapter(List<GankInfo> mContentList, Activity activity) {
         super(mContentList);
-        this.host = fragment;
+        this.host = activity;
     }
 
     @Override
@@ -41,9 +41,9 @@ public class GirlAdapter extends ProgressAdapter{
         ((GirlHolder)holder).setAspectRatio(0.618f);
         ((GirlHolder)holder).bindModel(info);
         ((GirlHolder)holder).imageView.setOnClickListener(v->{
-            Intent i = new Intent(host.getActivity(), PictureActivity.class);
+            Intent i = new Intent(host, PictureActivity.class);
             i.putExtra("uri",info.getUrl());
-            host.getActivity().startActivity(i);
+            host.startActivity(i);
         });
     }
 }
