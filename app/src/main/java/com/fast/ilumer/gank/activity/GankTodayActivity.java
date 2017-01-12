@@ -78,7 +78,7 @@ public class GankTodayActivity extends AppCompatActivity {
                 .mapToOne(GankDaily.parse)
                 .filter(Funcs.not(Results.isNull()))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(GanKTodaySuccess));
+                .subscribe(GankTodaySuccess));
         Observable<Result<GankRepositories<GankDaily>>> result = Observable.just(dayPath)
                 .concatMap(getGank)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -145,7 +145,7 @@ public class GankTodayActivity extends AppCompatActivity {
     };
 
     //这里可以通过多播来实现了图片和adapter的加载 但是意义不大所以改为了这种方式
-    private final Action1<GankDaily> GanKTodaySuccess = new Action1<GankDaily>() {
+    private final Action1<GankDaily> GankTodaySuccess = new Action1<GankDaily>() {
         @Override
         public void call(GankDaily gankDaily) {
             temp = gankDaily;

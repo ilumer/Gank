@@ -1,8 +1,5 @@
 package com.fast.ilumer.gank;
 
-import android.app.SearchManager;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -11,14 +8,13 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.fast.ilumer.gank.activity.GankTodayActivity;
-import com.fast.ilumer.gank.activity.SearchResultActivity;
+import com.fast.ilumer.gank.activity.SearchActivity;
 import com.fast.ilumer.gank.fragment.GankMeiZiFragment;
 import com.fast.ilumer.gank.fragment.GankTypeFragment;
 
@@ -62,11 +58,6 @@ public class MainActivity extends AppCompatActivity{
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu,menu);
-        MenuItem searchitem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) searchitem.getActionView();
-        SearchManager manager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView.setSearchableInfo(manager.getSearchableInfo(
-                new ComponentName(MainActivity.this, SearchResultActivity.class)));
         //http://stackoverflow.com/questions/29540724/start-new-activity-from-searchview
         return true;
     }
@@ -76,6 +67,11 @@ public class MainActivity extends AppCompatActivity{
         switch (item.getItemId()) {
             case R.id.today_gank:{
                 Intent i = new Intent(this, GankTodayActivity.class);
+                startActivity(i);
+                return true;
+            }
+            case R.id.action_search:{
+                Intent i = new Intent(this, SearchActivity.class);
                 startActivity(i);
                 return true;
             }
@@ -117,8 +113,6 @@ public class MainActivity extends AppCompatActivity{
                     return GankTypeFragment.newInstance(titles[5]);
                 case 6:
                     return GankMeiZiFragment.newInstance(titles[6]);
-                case 7:
-                    return GankTypeFragment.newInstance(titles[7]);
                 default:
                     return null;
             }

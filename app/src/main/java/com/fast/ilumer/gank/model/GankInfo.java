@@ -53,6 +53,7 @@ public class GankInfo {
 
     public void setDatebaseId(int datebaseId) {
         this.datebaseId = datebaseId;
+        return;
     }
 
     public boolean isUsed() {

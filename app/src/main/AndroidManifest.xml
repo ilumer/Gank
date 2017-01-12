@@ -17,13 +17,11 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <meta-data
-                android:name="android.app.default_searchable"
-                android:value=".SearchResultActivity"/>
         </activity>
         <activity android:name=".activity.PictureActivity" />
         <activity android:name=".activity.GankTodayActivity" />
-        <activity android:name=".activity.SearchResultActivity"
+        <activity android:name=".activity.SearchActivity"
+            android:theme="@style/SearchActivity.Gank.Theme"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />

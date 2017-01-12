@@ -9,6 +9,11 @@
         <item name="android:listDivider">@drawable/divider</item>
     </style>
 
+    <style name="SearchActivity.Gank.Theme" parent="Base.Gank.Theme">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+
 
     <style name="Custom.Tablaout.Theme" parent="TextAppearance.Design.Tab">
         <item name="textAllCaps">false</item>

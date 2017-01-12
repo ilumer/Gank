@@ -11,6 +11,7 @@ public final class Db {
     public static final int BOOLEAN_FALSE = 0;
     public static final int BOOLEAN_TRUE = 1;
     public static final String TODAY_TABLE_NAME = "gankDaily";
+    public static final String TYPE_TABLE_NAME = "gankType";
 
     public static String getString(Cursor cursor, String columnName) {
         return cursor.getString(cursor.getColumnIndexOrThrow(columnName));
