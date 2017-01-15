@@ -17,6 +17,7 @@ public final class GankInfoContract {
         public static final String URL_ID = "url_id";
         //用来比较eqauls原本就继承了id 映射的是gank api中的
         public static final String URL = "url";
+        public static final String IMAGE = "image";
         public static final String PUBLISHRD_AT ="published_at";
         public static final String CREATED_AT = "created_at";
         public static final String WHO = "who";

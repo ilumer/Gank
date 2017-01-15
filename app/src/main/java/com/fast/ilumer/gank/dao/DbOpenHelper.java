@@ -4,8 +4,9 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import static com.fast.ilumer.gank.dao.Db.TYPE_TABLE_NAME;
 import static com.fast.ilumer.gank.dao.Db.TODAY_TABLE_NAME;
+import static com.fast.ilumer.gank.dao.Db.TYPE_IMAGE;
+import static com.fast.ilumer.gank.dao.Db.TYPE_TABLE_NAME;
 
 /**
  * Created by root on 11/26/16.
@@ -38,6 +39,14 @@ public class DbOpenHelper extends SQLiteOpenHelper {
             +GankInfoContract.GankEntry.TYPE + " TEXT "
             + ")";
 
+    public static final String SQL_EXTRL_IMAGES = "create table " + TYPE_IMAGE + " ( "
+            + GankInfoContract.GankEntry._ID + " Integer primary key,"
+            + GankInfoContract.GankEntry.IMAGE + " TEXT , "
+            + GankInfoContract.GankEntry.URL_ID + " TEXT , "
+            + "FOREIGN KEY ( " + GankInfoContract.GankEntry.URL_ID + " ) REFERENCES "
+            +TYPE_TABLE_NAME + " ( " + GankInfoContract.GankEntry.URL_ID + " ) ON DELETE CASCADE"
+            + ")";
+
     public DbOpenHelper(Context context) {
         super(context, "gank", null,1  );
     }
@@ -46,6 +55,8 @@ public class DbOpenHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_GANKDAILY);
         db.execSQL(SQL_CREATE_GANKTYPE);
+        db.execSQL(SQL_EXTRL_IMAGES);
+        db.execSQL("PRAGMA foreign_keys = ON");
     }
 
     @Override

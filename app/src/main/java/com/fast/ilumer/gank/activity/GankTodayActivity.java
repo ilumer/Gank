@@ -123,7 +123,6 @@ public class GankTodayActivity extends AppCompatActivity {
             BriteDatabase.Transaction transaction = db.newTransaction();
             try{
                 db.execute("delete From "+Db.TODAY_TABLE_NAME+" where "+ GankInfoContract.GankEntry._ID+" > -1");
-                db.insert(Db.TODAY_TABLE_NAME,new GankInfo.Builder(gankDaily.Meizi.get(0)).build());
                 List<GankInfo> infoList = GanKDailyToList(gankDaily);
                 for (GankInfo info:infoList){
                     db.insert(Db.TODAY_TABLE_NAME,new GankInfo.Builder(info).build());

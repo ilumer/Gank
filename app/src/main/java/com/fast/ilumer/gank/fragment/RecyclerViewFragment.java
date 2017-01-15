@@ -26,6 +26,7 @@ import butterknife.BindView;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -73,19 +74,23 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(mAdapter));
             }
-        });mSwipeRefreshLayout.setOnRefreshListener(this);
+        });
+        addDivider(mContent);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
         mSubscription.add(Observable.fromCallable(new Func0<Cursor>() {
             @Override
             public Cursor call() {
-                return db.query("select * from"+Db.TYPE_TABLE_NAME);
+                return db.query("select * from "+Db.TYPE_TABLE_NAME +" where type = ?",type);
             }
         })
                 .map(mapToList)
-                .filter(list -> !list.isEmpty())
+                .filter(list -> list.size()!=0)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(mAdapter));
         onRefresh();
     }
+
+
 
     @Override
     public void onStart() {
@@ -102,6 +107,7 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
         @Override
         public List<GankInfo> call(Cursor cursor) {
             List<GankInfo> temp = new ArrayList<>();
+            cursor.moveToFirst();
             try {
                 do {
                     GankInfo info = new GankInfo();
@@ -136,6 +142,22 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
         mSwipeRefreshLayout.setRefreshing(true);
         mSubscription.add(getReslut(1)
                 .filter(list -> mContentList.isEmpty() || mContentList.containsAll(list))
+                .doOnNext(new Action1<List<GankInfo>>() {
+                    @Override
+                    public void call(List<GankInfo> list) {
+                        db.execute("delete From "+Db.TYPE_TABLE_NAME+" where "+ GankInfoContract.GankEntry._ID+" > -1 and " + GankInfoContract.GankEntry.TYPE + " = ?",type);
+                        //这里直接使用字符串拼接竟然会直接出现问题
+                        //http://stackoverflow.com/questions/21958789/sqlite-insert-issue-error-no-such-column
+                        //http://stackoverflow.com/questions/6337296/sqlite-exception-no-such-column-when-trying-to-select
+                        for (GankInfo info:list){
+                            db.insert(Db.TYPE_TABLE_NAME,new GankInfo.Builder(info).build());
+                            if (info.getImages()!=null){
+                                for (String url:info.getImages())
+                                    db.insert(Db.TYPE_IMAGE,Db.imageBuilder(url,info.get_id()));
+                            }
+                        }
+                    }
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<List<GankInfo>>() {
                     @Override
@@ -172,4 +194,8 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
     protected abstract ProgressAdapter getAdapter(List<GankInfo> mContentList);
 
     protected abstract RecyclerView.LayoutManager getLayoutManager();
+
+    protected void addDivider(RecyclerView recyclerView){
+
+    }
 }

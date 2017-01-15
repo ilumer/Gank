@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import com.fast.ilumer.gank.model.GankInfo;
 import com.fast.ilumer.gank.model.InfoAdapter;
 import com.fast.ilumer.gank.model.ProgressAdapter;
+import com.fast.ilumer.gank.recyclerview.DividerItemDecoration;
 
 import java.util.List;
 
@@ -32,5 +33,10 @@ public class GankTypeFragment extends RecyclerViewFragment{
 
     protected RecyclerView.LayoutManager getLayoutManager() {
         return new LinearLayoutManager(getActivity());
+    }
+
+    @Override
+    protected void addDivider(RecyclerView recyclerView) {
+        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL_LIST));
     }
 }
