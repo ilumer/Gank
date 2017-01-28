@@ -14,9 +14,13 @@ android:            # 配置信息
     - extra-android-support          # Support Library
 
 jdk:
+- oraclejdk7
 - oraclejdk8
 
 before_install:
+  - export JAVA7_HOME=/usr/lib/jvm/java-7-oracle
+  - export JAVA8_HOME=/usr/lib/jvm/java-8-oracle
+  - export JAVA_HOME=$JAVA7_HOME
  - chmod +x gradlew  # 改变gradlew的访问权限
 
 script:              # 执行:下面的命令
@@ -24,7 +28,7 @@ script:              # 执行:下面的命令
 
 before_deploy:       # 部署之前
   # 使用 mv 命令进行修改apk文件的名字
-  #- mv app/build/outputs/apk/app-release.apk app/build/outputs/apk/buff.apk
+  mv app/build/outputs/apk/app-debug.apk app/build/outputs/apk/buff.apk
 
 deploy:              # 部署
   provider: releases # 部署到GitHub Release，除此之外，Travis CI还支持发布到fir.im、AWS、Google App Engine等
