@@ -12,7 +12,7 @@ import com.fast.ilumer.gank.recyclerview.DividerItemDecoration;
 import java.util.List;
 
 /**
- * Created by root on 10/15/16.
+ * Created by ilumer on 10/15/16.
  *
  */
 

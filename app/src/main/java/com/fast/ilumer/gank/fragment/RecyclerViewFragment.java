@@ -20,14 +20,13 @@ import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
@@ -77,16 +76,11 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
         });
         addDivider(mContent);
         mSwipeRefreshLayout.setOnRefreshListener(this);
-        mSubscription.add(Observable.fromCallable(new Func0<Cursor>() {
-            @Override
-            public Cursor call() {
-                return db.query("select * from "+Db.TYPE_TABLE_NAME +" where type = ?",type);
-            }
-        })
-                .map(mapToList)
-                .filter(list -> list.size()!=0)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(mAdapter));
+        db.createQuery(Db.TYPE_TABLE_NAME,"select * from "+Db.TYPE_TABLE_NAME+" where "+GankInfoContract.GankEntry.TYPE+" = ?",type)
+               .mapToOne(mapToList)
+               .filter(list -> list.size()!=0)
+               .observeOn(AndroidSchedulers.mainThread())
+               .subscribe(mAdapter);
         onRefresh();
     }
 
@@ -120,6 +114,8 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
                     info.setDesc(Db.getString(cursor, GankInfoContract.GankEntry.DESC));
                     info.setUrl(Db.getString(cursor, GankInfoContract.GankEntry.URL));
                     info.setUsed(Db.getBoolean(cursor, GankInfoContract.GankEntry.USED));
+                    String images = Db.getString(cursor,GankInfoContract.GankEntry.IMAGELIST);
+                    info.setImages(images==null?null: Arrays.asList(Util.convertStringToArray(images)));
                     temp.add(info);
                 } while (cursor.moveToNext());
             } finally {
@@ -142,22 +138,6 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
         mSwipeRefreshLayout.setRefreshing(true);
         mSubscription.add(getReslut(1)
                 .filter(list -> mContentList.isEmpty() || mContentList.containsAll(list))
-                .doOnNext(new Action1<List<GankInfo>>() {
-                    @Override
-                    public void call(List<GankInfo> list) {
-                        db.execute("delete From "+Db.TYPE_TABLE_NAME+" where "+ GankInfoContract.GankEntry._ID+" > -1 and " + GankInfoContract.GankEntry.TYPE + " = ?",type);
-                        //这里直接使用字符串拼接竟然会直接出现问题
-                        //http://stackoverflow.com/questions/21958789/sqlite-insert-issue-error-no-such-column
-                        //http://stackoverflow.com/questions/6337296/sqlite-exception-no-such-column-when-trying-to-select
-                        for (GankInfo info:list){
-                            db.insert(Db.TYPE_TABLE_NAME,new GankInfo.Builder(info).build());
-                            if (info.getImages()!=null){
-                                for (String url:info.getImages())
-                                    db.insert(Db.TYPE_IMAGE,Db.imageBuilder(url,info.get_id()));
-                            }
-                        }
-                    }
-                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<List<GankInfo>>() {
                     @Override
@@ -172,17 +152,20 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
 
                     @Override
                     public void onNext(List<GankInfo> list) {
-                        if (mContentList.size() >= 10) {
-                            for (int i = 0; i < list.size(); i++) {
-                                mContentList.set(i, list.get(i));
+                        BriteDatabase.Transaction transaction = db.newTransaction();
+                        try {
+                            db.execute("delete From " + Db.TYPE_TABLE_NAME + " where " + GankInfoContract.GankEntry._ID + " > -1 and " + GankInfoContract.GankEntry.TYPE + " = ?", type);
+                            //这里直接使用字符串拼接竟然会直接出现问题
+                            //http://stackoverflow.com/questions/21958789/sqlite-insert-issue-error-no-such-column
+                            //http://stackoverflow.com/questions/6337296/sqlite-exception-no-such-column-when-trying-to-select}
+                            for (GankInfo info:list) {
+                                db.insert(Db.TYPE_TABLE_NAME, new GankInfo.Builder(info).build());
                             }
-                            mAdapter.notifyItemRangeChanged(0, list.size());
-                        } else {
-                            mContentList.addAll(list);
-                            mAdapter.notifyItemRangeInserted(0, list.size());
+                            transaction.markSuccessful();
+                        } finally {
+                            transaction.end();
                         }
                     }
-
                 }));
     }
 

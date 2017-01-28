@@ -4,10 +4,12 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.fast.ilumer.gank.dao.Db;
+import com.fast.ilumer.gank.dao.DbOpenHelper;
+import com.fast.ilumer.gank.dao.GankInfoContract;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static org.junit.Assert.*;
 
 /**
  * Instrumentation test, which will execute on an Android device.
@@ -20,7 +22,7 @@ public class ExampleInstrumentedTest {
     public void useAppContext() throws Exception {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
-
-        assertEquals("com.fast.ilumer.gank", appContext.getPackageName());
+        DbOpenHelper helper = new DbOpenHelper(appContext);
+        helper.getReadableDatabase().rawQuery("select * from "+ Db.TYPE_TABLE_NAME+" where "+ GankInfoContract.GankEntry.TYPE+" = ?",new String[]{"Android"});
     }
 }

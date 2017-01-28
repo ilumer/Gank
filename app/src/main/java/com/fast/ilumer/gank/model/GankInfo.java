@@ -38,8 +38,14 @@ public class GankInfo {
             values.put(GankInfoContract.GankEntry.TYPE,info.getType());
             values.put(GankInfoContract.GankEntry.WHO,info.getWho());
             values.put(GankInfoContract.GankEntry.USED,info.isUsed());
-            if (info.getDatebaseId()!=-1)
-            values.put(GankInfoContract.GankEntry._ID,info.getDatebaseId());
+            if (info.getImages()!=null) {
+                values.put(GankInfoContract.GankEntry.IMAGELIST,
+                        Util.convertArrayToString(info.getImages().toArray(new String[0])));
+                //http://stackoverflow.com/questions/4042434/converting-arrayliststring-to-string-in-java
+            }
+            if (info.getDatebaseId()!=-1) {
+                values.put(GankInfoContract.GankEntry._ID, info.getDatebaseId());
+            }
         }
 
         public ContentValues build(){

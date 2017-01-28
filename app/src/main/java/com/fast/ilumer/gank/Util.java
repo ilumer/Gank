@@ -15,6 +15,7 @@ import java.util.TimeZone;
  */
 
 public class Util {
+    private static final String strSeparator= "_,_";
     public static int getPhoneWidth(Display display){
         Point size = new Point();
         display.getSize(size);
@@ -45,4 +46,17 @@ public class Util {
         str = format.format(date);
         return str;
     }
+
+    public static String convertArrayToString(String[] array){
+        StringBuilder builder = new StringBuilder();
+        for (int i =0 ; i < array.length; i++){
+            builder.append(array[i]).append(strSeparator);
+        }
+        return builder.toString();
+    }
+
+    public static String[] convertStringToArray(String str){
+        return str.split(strSeparator);
+    }
+
 }

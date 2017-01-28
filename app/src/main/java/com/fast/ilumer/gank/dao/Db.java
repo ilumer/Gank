@@ -1,6 +1,5 @@
 package com.fast.ilumer.gank.dao;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 
 /**
@@ -13,14 +12,6 @@ public final class Db {
     public static final int BOOLEAN_TRUE = 1;
     public static final String TODAY_TABLE_NAME = "gankDaily";
     public static final String TYPE_TABLE_NAME = "gankType";
-    public static final String TYPE_IMAGE = "gankTypeImage";
-
-    public static ContentValues imageBuilder(String imageUrl, String urlId){
-        ContentValues values = new ContentValues();
-        values.put(GankInfoContract.GankEntry.IMAGE,imageUrl);
-        values.put(GankInfoContract.GankEntry.URL_ID,urlId);
-        return values;
-    }
 
     public static String getString(Cursor cursor, String columnName) {
         return cursor.getString(cursor.getColumnIndexOrThrow(columnName));
