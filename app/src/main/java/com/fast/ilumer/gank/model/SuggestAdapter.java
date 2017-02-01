@@ -12,13 +12,14 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.functions.Action1;
 
 /**
  * Created by ilumer on 1/11/17.
  *
  */
 
-public class SuggestAdapter extends RecyclerView.Adapter<SuggestAdapter.SuggestionVH>{
+public class SuggestAdapter extends RecyclerView.Adapter<SuggestAdapter.SuggestionVH> implements Action1<List<String>>{
 
     private List<String> mSuggestionList;
 
@@ -54,5 +55,11 @@ public class SuggestAdapter extends RecyclerView.Adapter<SuggestAdapter.Suggesti
         protected void bindModel(String item){
             mSuggestion.setText(item);
         }
+    }
+
+    @Override
+    public void call(List<String> strings) {
+        mSuggestionList = strings;
+        notifyDataSetChanged();
     }
 }

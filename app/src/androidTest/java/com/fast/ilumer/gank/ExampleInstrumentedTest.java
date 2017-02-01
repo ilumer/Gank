@@ -6,7 +6,6 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.fast.ilumer.gank.dao.Db;
 import com.fast.ilumer.gank.dao.DbOpenHelper;
-import com.fast.ilumer.gank.dao.GankInfoContract;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +22,12 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
         DbOpenHelper helper = new DbOpenHelper(appContext);
-        helper.getReadableDatabase().rawQuery("select * from "+ Db.TYPE_TABLE_NAME+" where "+ GankInfoContract.GankEntry.TYPE+" = ?",new String[]{"Android"});
+        helper.getReadableDatabase().query(Db.TYPE_TABLE_NAME,
+                new String[]{"Distinct(type)"},
+                null,
+                null,
+                null,
+                null,
+                null);
     }
 }

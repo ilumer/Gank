@@ -22,4 +22,5 @@
     <string name="error_network">检测你的网络是否出现了问题,你的干货被谁吃了</string>
     <string name="search_hint">serach gank</string>
     <string name="action_search">serach</string>
+    <string name="content_authority">com.fast.ilumer.gank</string>
 </resources>

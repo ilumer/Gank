@@ -14,7 +14,7 @@ import static com.fast.ilumer.gank.dao.Db.TYPE_TABLE_NAME;
 
 public class DbOpenHelper extends SQLiteOpenHelper {
 
-    private static final String SQL_CREATE_GANKDAILY = "create table "+TODAY_TABLE_NAME+" ( "
+    public static final String SQL_CREATE_GANKDAILY = "create table if not exists "+TODAY_TABLE_NAME+" ( "
             +GankInfoContract.GankEntry._ID + " Integer primary key,"
             +GankInfoContract.GankEntry.URL_ID + " TEXT , "
             +GankInfoContract.GankEntry.URL + " TEXT , "
@@ -26,7 +26,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
             +GankInfoContract.GankEntry.TYPE + " TEXT "
             + ")";
 
-    private static final String SQL_CREATE_GANKTYPE = "create table " + TYPE_TABLE_NAME + " ( "
+    public static final String SQL_CREATE_GANKTYPE = "create table if not exists " + TYPE_TABLE_NAME + " ( "
             +GankInfoContract.GankEntry._ID + " Integer primary key,"
             +GankInfoContract.GankEntry.URL_ID + " TEXT , "
             +GankInfoContract.GankEntry.URL + " TEXT , "
