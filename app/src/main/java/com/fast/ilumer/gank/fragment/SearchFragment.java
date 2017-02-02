@@ -57,8 +57,8 @@ public class SearchFragment extends BaseFragment implements OnClickListener{
                 return getActivity().getContentResolver().query(
                         GankInfoContract.GankEntry.CONTENT_URI,
                         new String[]{"Distinct("+GankInfoContract.GankEntry.TYPE+")"},
-                        null,
-                        null,
+                        GankInfoContract.GankEntry.TYPE+" != ?",
+                        new String[]{"福利"},
                         null
                         );
             }
@@ -135,6 +135,7 @@ public class SearchFragment extends BaseFragment implements OnClickListener{
     public void OnClick(SearchRepo repo) {
         if (repo.getTag()==SearchTag.type){
             Intent i = new Intent(getActivity(), SearchResultActivity.class);
+            i.putExtra(SearchResultActivity.EXTRA_STRING,repo.getShowItem());
             getActivity().startActivity(i);
         }else if (repo.getTag()==SearchTag.item){
             CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
