@@ -1,7 +1,6 @@
 package com.fast.ilumer.gank.model;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +36,6 @@ public abstract class ProgressAdapter extends
         if (isLoadingMore) return;
         isLoadingMore = true;
         notifyItemInserted(getDataCount());
-        Log.e("start loading","start loading");
     }
 
 

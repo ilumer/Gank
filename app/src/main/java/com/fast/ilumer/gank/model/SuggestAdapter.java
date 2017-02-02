@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.fast.ilumer.gank.R;
+import com.fast.ilumer.gank.model.listener.OnClickListener;
 
 import java.util.List;
 
@@ -19,12 +20,13 @@ import rx.functions.Action1;
  *
  */
 
-public class SuggestAdapter extends RecyclerView.Adapter<SuggestAdapter.SuggestionVH> implements Action1<List<String>>{
+public class SuggestAdapter extends RecyclerView.Adapter<SuggestAdapter.SuggestionVH>
+        implements Action1<List<SearchRepo>>{
 
-    private List<String> mSuggestionList;
+    private List<SearchRepo> mSuggestionList;
+    private OnClickListener mlistener;
 
-
-    public SuggestAdapter(List<String> mSuggestionList) {
+    public SuggestAdapter(List<SearchRepo> mSuggestionList) {
         super();
         this.mSuggestionList = mSuggestionList;
     }
@@ -36,7 +38,14 @@ public class SuggestAdapter extends RecyclerView.Adapter<SuggestAdapter.Suggesti
 
     @Override
     public void onBindViewHolder(SuggestionVH holder, int position) {
-        holder.bindModel(mSuggestionList.get(position));
+        holder.bindModel(mSuggestionList.get(position).getShowItem());
+        holder.itemView.setOnClickListener(v -> {
+            mlistener.OnClick(mSuggestionList.get(position));
+        });
+    }
+
+    public void setOnClicklistener(OnClickListener listener){
+        mlistener = listener;
     }
 
     @Override
@@ -47,6 +56,8 @@ public class SuggestAdapter extends RecyclerView.Adapter<SuggestAdapter.Suggesti
     static class SuggestionVH extends RecyclerView.ViewHolder{
         @BindView(R.id.search_suggestion)
         TextView mSuggestion;
+        @BindView(R.id.list_item)
+        View itemView;
         public SuggestionVH(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);
@@ -58,8 +69,8 @@ public class SuggestAdapter extends RecyclerView.Adapter<SuggestAdapter.Suggesti
     }
 
     @Override
-    public void call(List<String> strings) {
-        mSuggestionList = strings;
+    public void call(List<SearchRepo> searchRepos) {
+        mSuggestionList = searchRepos;
         notifyDataSetChanged();
     }
 }

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * Created by root on 10/16/16.
@@ -16,6 +17,7 @@ import butterknife.Unbinder;
 
 public abstract class BaseFragment extends Fragment {
     private Unbinder unbinder;
+    protected CompositeSubscription subscription;
     View mRootView;
     protected abstract int getLayoutId();
     @Override
@@ -24,6 +26,7 @@ public abstract class BaseFragment extends Fragment {
             mRootView = inflater.inflate(getLayoutId(),container,false);
         }
         unbinder= ButterKnife.bind(this,mRootView);
+        subscription = new CompositeSubscription();
         return mRootView;
     }
 
@@ -35,5 +38,6 @@ public abstract class BaseFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        subscription.clear();
     }
 }

@@ -9,7 +9,7 @@ public class SearchActivity extends BaseActivity {
 
     @Override
     protected void onNewIntent(Intent intent) {
-
+        //SearchActivity 一定会出栈
     }
 
     @Override
