@@ -28,7 +28,7 @@ public class RetrofitHelper {
                 .client(client)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
-        .build();
+                .build();
     }
 
     public static RetrofitHelper getInstance(){

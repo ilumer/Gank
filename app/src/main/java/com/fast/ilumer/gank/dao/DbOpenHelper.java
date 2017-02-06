@@ -23,6 +23,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
             +GankInfoContract.GankEntry.DESC + " TEXT, "
             +GankInfoContract.GankEntry.WHO + " TEXT, "
             +GankInfoContract.GankEntry.USED + " Interger, "
+            +GankInfoContract.GankEntry.IMAGELIST+ " TEXT, "
             +GankInfoContract.GankEntry.TYPE + " TEXT "
             + ")";
 

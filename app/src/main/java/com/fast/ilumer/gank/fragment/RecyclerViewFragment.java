@@ -93,14 +93,6 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
                    }
                    mAdapter.notifyDataSetChanged();
                }));
-    }
-
-
-
-    @Override
-    public void onStart() {
-        Log.e(type,"onStart");
-        super.onStart();
         onRefresh();
     }
 
