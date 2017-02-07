@@ -11,6 +11,7 @@ import android.support.customtabs.CustomTabsIntent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
 import android.view.View;
 
 import com.fast.ilumer.gank.R;
@@ -51,31 +52,7 @@ public class SearchFragment extends BaseFragment implements OnClickListener{
         mSearchSuggestion.setAdapter(mAdapter);
         mSearchSuggestion.setLayoutManager(mLinearLayoutManager);
         setUpSearchView();
-        subscription.add(Observable.fromCallable(new Callable<Cursor>() {
-            @Override
-            public Cursor call() throws Exception {
-                return getActivity().getContentResolver().query(
-                        GankInfoContract.GankEntry.CONTENT_URI,
-                        new String[]{"Distinct("+GankInfoContract.GankEntry.TYPE+")"},
-                        GankInfoContract.GankEntry.TYPE+" != ?",
-                        new String[]{"福利"},
-                        null
-                        );
-            }
-        }).map(cursor -> {
-            cursor.moveToFirst();
-            List<SearchRepo> mlist = new ArrayList<>();
-            do {
-                SearchRepo repo = new SearchRepo();
-                repo.setShowItem(Db.getString(cursor,GankInfoContract.GankEntry.TYPE));
-                repo.setTag(SearchTag.type);
-                mlist.add(repo);
-            }while (cursor.moveToNext());
-            return mlist;
-        })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(mAdapter));
+        searchFor();
     }
 
     private void setUpSearchView(){
@@ -93,11 +70,43 @@ public class SearchFragment extends BaseFragment implements OnClickListener{
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                searchFor(newText);
+                if (TextUtils.isEmpty(newText)){
+                    searchFor();
+                }else {
+                    searchFor(newText);
+                }
                 return true;
             }
         });
 
+    }
+
+    private void searchFor(){
+        subscription.add(Observable.fromCallable(new Callable<Cursor>() {
+            @Override
+            public Cursor call() throws Exception {
+                return getActivity().getContentResolver().query(
+                        GankInfoContract.GankEntry.CONTENT_URI,
+                        new String[]{"Distinct("+GankInfoContract.GankEntry.TYPE+")"},
+                        GankInfoContract.GankEntry.TYPE+" != ?",
+                        new String[]{"福利"},
+                        null
+                );
+            }
+        }).map(cursor -> {
+            cursor.moveToFirst();
+            List<SearchRepo> mlist = new ArrayList<>();
+            do {
+                SearchRepo repo = new SearchRepo();
+                repo.setShowItem(Db.getString(cursor,GankInfoContract.GankEntry.TYPE));
+                repo.setTag(SearchTag.type);
+                mlist.add(repo);
+            }while (cursor.moveToNext());
+            return mlist;
+        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(mAdapter));
     }
 
     private void searchFor(String query) {

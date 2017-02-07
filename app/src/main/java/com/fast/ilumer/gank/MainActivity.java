@@ -88,6 +88,8 @@ public class MainActivity extends AppCompatActivity{
 
     public static class ViewPageAdapter extends FragmentStatePagerAdapter {
         //不同的viewpager的adapter的区别
+        //FragmentStatePagerAdapter 会将fragment实例销毁所以需要layoutstate销毁掉
+        //FragmentPagerAdapter 不会销毁实例 但是会销毁视图
         //http://stackoverflow.com/questions/18747975/difference-between-fragmentpageradapter-and-fragmentstatepageradapter
         private final String[] titles;
 
