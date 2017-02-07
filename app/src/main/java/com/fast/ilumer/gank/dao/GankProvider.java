@@ -6,13 +6,12 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 /**
  * Created by ${ilumer} on 1/29/17.
  */
 
-public class GankTypeProvider extends ContentProvider {
+public class GankProvider extends ContentProvider {
 
     private static final UriMatcher mUriMatcher = buildUriMatcher() ;
     static final int GANKTYPE = 100;
@@ -31,7 +30,6 @@ public class GankTypeProvider extends ContentProvider {
         Cursor retCursor;
         switch (match){
             case GANKTYPE:{
-                Log.e(projection[0],uri.toString());
                 retCursor = mDbOpenHelper.getReadableDatabase().query(
                         Db.TYPE_TABLE_NAME,
                         projection,
@@ -46,6 +44,7 @@ public class GankTypeProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("unexpected uri :"+uri);
         }
+        retCursor.setNotificationUri(getContext().getContentResolver(),uri);
         return retCursor;
     }
 
@@ -79,6 +78,7 @@ public class GankTypeProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("unexpected uri :"+uri);
         }
+        getContext().getContentResolver().notifyChange(uri,null);
         return returnUri;
     }
 
@@ -96,6 +96,7 @@ public class GankTypeProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
             }
         }
+        getContext().getContentResolver().notifyChange(uri,null);
         return rowsDeleted;
     }
 
@@ -113,6 +114,7 @@ public class GankTypeProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
             }
         }
+        getContext().getContentResolver().notifyChange(uri,null);
         return rowUpdated;
     }
 

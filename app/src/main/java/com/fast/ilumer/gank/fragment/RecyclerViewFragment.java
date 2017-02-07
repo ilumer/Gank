@@ -144,7 +144,7 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
         mSwipeRefreshLayout.setRefreshing(true);
         mSubscription.add(getReslut(1)
                 .filter(list -> !mContentList.containsAll(list))
-                .doOnNext(list -> {
+                .map(list -> {
                     BriteDatabase.Transaction transaction = db.newTransaction();
                     try {
                         db.execute("delete From " + Db.TYPE_TABLE_NAME + " where " + GankInfoContract.GankEntry._ID + " > -1 and " + GankInfoContract.GankEntry.TYPE + " = ?", type);
@@ -158,7 +158,9 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
                     } finally {
                         transaction.end();
                     }
+                    return list;
                 })
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<List<GankInfo>>() {
                     @Override

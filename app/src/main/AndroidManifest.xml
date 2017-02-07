@@ -31,7 +31,7 @@
         <activity android:name=".activity.SearchResultActivity" />
         <provider
             android:authorities="@string/content_authority"
-            android:name=".dao.GankTypeProvider"
+            android:name=".dao.GankProvider"
             android:exported="false"/>
     </application>
 

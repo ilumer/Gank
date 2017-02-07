@@ -30,6 +30,4 @@ public class ExampleInstrumentedTest {
                 null,
                 null);
     }
-
-
 }

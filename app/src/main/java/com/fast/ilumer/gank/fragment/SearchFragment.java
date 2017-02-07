@@ -96,12 +96,16 @@ public class SearchFragment extends BaseFragment implements OnClickListener{
         }).map(cursor -> {
             cursor.moveToFirst();
             List<SearchRepo> mlist = new ArrayList<>();
-            do {
-                SearchRepo repo = new SearchRepo();
-                repo.setShowItem(Db.getString(cursor,GankInfoContract.GankEntry.TYPE));
-                repo.setTag(SearchTag.type);
-                mlist.add(repo);
-            }while (cursor.moveToNext());
+            try {
+                do {
+                    SearchRepo repo = new SearchRepo();
+                    repo.setShowItem(Db.getString(cursor, GankInfoContract.GankEntry.TYPE));
+                    repo.setTag(SearchTag.type);
+                    mlist.add(repo);
+                } while (cursor.moveToNext());
+            }finally {
+                cursor.close();
+            }
             return mlist;
         })
                 .subscribeOn(Schedulers.io())
@@ -125,13 +129,17 @@ public class SearchFragment extends BaseFragment implements OnClickListener{
                 /*http://stackoverflow.com/questions/5179563/sqlite-like-problem-in-android*/
         }).map(cursor -> {
             List<SearchRepo> mlist = new ArrayList<>();
-            cursor.moveToFirst();
-            while (cursor.moveToNext()) {
-                SearchRepo repo = new SearchRepo();
-                repo.setShowItem(Db.getString(cursor, GankInfoContract.GankEntry.DESC));
-                repo.setUri(Db.getString(cursor, GankInfoContract.GankEntry.URL));
-                repo.setTag(SearchTag.item);
-                mlist.add(repo);
+            try {
+                cursor.moveToFirst();
+                while (cursor.moveToNext()) {
+                    SearchRepo repo = new SearchRepo();
+                    repo.setShowItem(Db.getString(cursor, GankInfoContract.GankEntry.DESC));
+                    repo.setUri(Db.getString(cursor, GankInfoContract.GankEntry.URL));
+                    repo.setTag(SearchTag.item);
+                    mlist.add(repo);
+                }
+            }finally {
+                cursor.close();
             }
             return mlist;
         })
