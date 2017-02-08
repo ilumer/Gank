@@ -1,6 +1,9 @@
 package com.fast.ilumer.gank.model;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -12,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.fast.ilumer.gank.R;
+import com.fast.ilumer.gank.activity.PictureActivity;
 import com.fast.ilumer.gank.model.viewholder.GirlHolder;
 
 import java.util.List;
@@ -67,6 +71,10 @@ public class GankDailyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             case TYPE_HEADER_VIEW:{
                 ((GirlHolder)holder).setAspectRatio(1.2f);
                 ((GirlHolder)holder).bindModel(info);
+                ((GirlHolder)holder).imageView.setOnClickListener(v -> {
+                    Intent i = new Intent(host,PictureActivity.class);
+                    host.startActivity(i);
+                });
                 break;
             }
         }
@@ -129,6 +137,10 @@ public class GankDailyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             //http://stackoverflow.com/questions/8999781/android-two-sentences-two-styles-one-textview
             //实现两个style的textview
             content.setText(builder);
+            content.setOnClickListener(v -> {
+                CustomTabsIntent intent = new CustomTabsIntent.Builder().build();
+                intent.launchUrl(host, Uri.parse(info.getUrl()));
+            });
         }
     }
 }
