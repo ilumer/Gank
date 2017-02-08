@@ -1,6 +1,7 @@
 package com.fast.ilumer.gank.activity;
 
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,12 +11,15 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.fast.ilumer.gank.R;
+import com.fast.ilumer.gank.Util;
 import com.fast.ilumer.gank.dao.Db;
 import com.fast.ilumer.gank.dao.DbOpenHelper;
 import com.fast.ilumer.gank.dao.GankInfoContract;
+import com.fast.ilumer.gank.fragment.DatePickerDialogFragment;
 import com.fast.ilumer.gank.fragment.TipDialogFragment;
 import com.fast.ilumer.gank.model.GankDaily;
 import com.fast.ilumer.gank.model.GankDailyAdapter;
+import com.fast.ilumer.gank.model.GankDay;
 import com.fast.ilumer.gank.model.GankInfo;
 import com.fast.ilumer.gank.model.GankRepositories;
 import com.fast.ilumer.gank.network.RetrofitHelper;
@@ -25,7 +29,6 @@ import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -38,27 +41,30 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
 import rx.subscriptions.CompositeSubscription;
 
-public class GankTodayActivity extends AppCompatActivity {
+public class GankTodayActivity extends AppCompatActivity
+        implements DatePickerDialogFragment.onDataSetListener{
 
     private CompositeSubscription subscription;
     private GankDailyAdapter adapter;
     private LinearLayoutManager linearlayoutManager;
     private List<GankInfo> contentList = new ArrayList<>();
-    private  boolean hasGank ;
     private SqlBrite sqlBrite = new SqlBrite.Builder().build();
     private BriteDatabase db ;
     private GankDaily temp;
+    private GankDay day;
+    private PublishSubject<GankDay> subject;
     @BindView(R.id.content)
     RecyclerView content;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.empty)
     TextView textView;
+    @BindView(R.id.fab)
+    FloatingActionButton fab;
     Unbinder unbinder;
-    Date currentDate= new Date();
-    DayPath dayPath = new DayPath();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +73,7 @@ public class GankTodayActivity extends AppCompatActivity {
         unbinder = ButterKnife.bind(this);
         db = sqlBrite.wrapDatabaseHelper(new DbOpenHelper(this),Schedulers.io());
         setSupportActionBar(toolbar);
+        subject = PublishSubject.create();
         initDayPath();
         subscription = new CompositeSubscription();
         adapter = new GankDailyAdapter(contentList,this);
@@ -79,13 +86,13 @@ public class GankTodayActivity extends AppCompatActivity {
                 .filter(Funcs.not(Results.isNull()))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(GankTodaySuccess));
-        Observable<Result<GankRepositories<GankDaily>>> result = Observable.just(dayPath)
+        Observable<Result<GankRepositories<GankDaily>>> result = subject
                 .concatMap(getGank)
                 .observeOn(AndroidSchedulers.mainThread())
                 .share();
 
         subscription.add(result.filter(Funcs.not(Results.isSuccessful()))
-                .subscribe(GankTodayError));
+                .subscribe(gankTodayError));
         //检测网络异常
 
         Observable<GankDaily> returnData = result.
@@ -102,18 +109,26 @@ public class GankTodayActivity extends AppCompatActivity {
                 .observeOn(Schedulers.io())
                 .subscribe(dataInsert));
         //由于gank的每日的更新的item不确定所以对应的id更新的数据库的想法有一点的不合实际
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerDialogFragment fragment = DatePickerDialogFragment.Instance(day);
+                fragment.show(getSupportFragmentManager(),"DatePickerfragment");
+            }
+        });
+        subject.onNext(day);
     }
 
+    @Override
+    public void setDateSet(int year, int month, int dayOfMonth) {
+        day.setDay(dayOfMonth)
+                .setMonth(month)
+                .setYear(year);
+        subject.onNext(day);
+    }
 
     private void initDayPath(){
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(currentDate);
-        dayPath.year = cal.get(Calendar.YEAR);
-        dayPath.month = cal.get(Calendar.MONTH)+1;
-        //http://stackoverflow.com/questions/344380/why-is-january-month-0-in-java-calendar
-        dayPath.day = cal.get(Calendar.DAY_OF_MONTH);
-        int number = cal.get(Calendar.DAY_OF_WEEK);
-        hasGank = number<7&&number>1;
+        day = new GankDay(Util.getDate(new Date()));
     }
 
     private final Action1<GankDaily> dataInsert = new Action1<GankDaily>() {
@@ -134,11 +149,12 @@ public class GankTodayActivity extends AppCompatActivity {
         }
     };
 
-    private final Func1<DayPath,Observable<Result<GankRepositories<GankDaily>>>> getGank =
-            new Func1<DayPath, Observable<Result<GankRepositories<GankDaily>>>>() {
+    private final Func1<GankDay,Observable<Result<GankRepositories<GankDaily>>>> getGank =
+            new Func1<GankDay, Observable<Result<GankRepositories<GankDaily>>>>() {
         @Override
-        public Observable<Result<GankRepositories<GankDaily>>> call(DayPath dayPath) {
-            return RetrofitHelper.getInstance().getGank().gankDailyInfo(dayPath.year,dayPath.month,dayPath.day)
+        public Observable<Result<GankRepositories<GankDaily>>> call(GankDay day) {
+            return RetrofitHelper.getInstance().getGank().gankDailyInfo(
+                    day.getYear(),day.getMonthForGank(),day.getDay())
                     .subscribeOn(Schedulers.io());
         }
     };
@@ -156,7 +172,7 @@ public class GankTodayActivity extends AppCompatActivity {
     };
 
 
-    private final Action1<Result<GankRepositories<GankDaily>>>   GankTodayError = new Action1<Result<GankRepositories<GankDaily>>>() {
+    private final Action1<Result<GankRepositories<GankDaily>>> gankTodayError = new Action1<Result<GankRepositories<GankDaily>>>() {
         @Override
         public void call(Result<GankRepositories<GankDaily>> gankRepositoriesResult) {
             if (gankRepositoriesResult.isError()){
@@ -175,14 +191,8 @@ public class GankTodayActivity extends AppCompatActivity {
     private final Action1<GankDaily> gankTodayNotUpdate = new Action1<GankDaily>() {
         @Override
         public void call(GankDaily gankDaily) {
-
-            if (hasGank){
-                TipDialogFragment HasGankFragment = TipDialogFragment.newInstance("干货还没有更新啦");
-                HasGankFragment.show(getSupportFragmentManager(),"UPDATE_GANK");
-            }else {
-                TipDialogFragment HasGankFragment = TipDialogFragment.newInstance("今天没有干货啦");
-                HasGankFragment.show(getSupportFragmentManager(),"NO_GANK");
-            }
+            TipDialogFragment HasGankFragment = TipDialogFragment.newInstance("今天暂时没有干货啦");
+            HasGankFragment.show(getSupportFragmentManager(),"NO_GANK");
         }
     };
 
@@ -217,11 +227,5 @@ public class GankTodayActivity extends AppCompatActivity {
             list.addAll(daily.Video);
         }
         return list;
-    }
-
-    public static class DayPath{
-        int year;
-        int month;
-        int day;
     }
 }

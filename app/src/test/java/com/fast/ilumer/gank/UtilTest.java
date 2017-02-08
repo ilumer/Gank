@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,6 +28,14 @@ public class UtilTest {
         String[] array1 = new String[]{"adadada"};
         String[] array2 = Util.convertStringToArray(str);
         Assert.assertArrayEquals(array1,array2);
+    }
+
+    @Test
+    public void getTime() throws Exception {
+        String datestr = "2011-08-12T20:17:46.384Z";
+        Date date= Util.dateparse(datestr);
+        int[] time = Util.getDate(date);
+        Assert.assertArrayEquals(new int[]{2011,7,13},time);
     }
 
 }

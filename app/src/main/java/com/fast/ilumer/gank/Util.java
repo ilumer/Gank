@@ -6,6 +6,7 @@ import android.view.Display;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -31,7 +32,7 @@ public class Util {
 
     public static Date dateparse(String str){
         Date date = new Date();
-      SimpleDateFormat format = initFormat();
+        SimpleDateFormat format = initFormat();
         try{
             date = format.parse(str);
         }catch (ParseException ex){
@@ -59,4 +60,14 @@ public class Util {
         return str.split(strSeparator);
     }
 
+
+    public static int[] getDate(Date date){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        //http://stackoverflow.com/questions/344380/why-is-january-month-0-in-java-calendar
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        return new int[]{year,month,day};
+    }
 }
