@@ -50,8 +50,11 @@ public class InfoAdapter extends ProgressAdapter{
             case GANK_TYPE_INFO:{
                 return new InfoHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.gank_info,parent,false));
             }
+            case GANK_INFO_PIC_INDICATE: {
+                return new InfoAllHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.gank_info_pic_indicate, parent, false));
+            }
             default:
-                return new InfoAllHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.gank_info_pic_indicate,parent,false));
+                throw new UnsupportedOperationException("sorry unsupport this type");
         }
     }
 

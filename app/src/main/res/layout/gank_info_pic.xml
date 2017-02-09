@@ -4,52 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/imageViewPager"
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="200dp"/>
 
-    <LinearLayout
-        android:id="@+id/bottom_background"
+    <include layout="@layout/gank_info"
         android:layout_width="match_parent"
-        android:orientation="vertical"
-        android:layout_height="72dp"
-        android:layout_gravity="bottom"
-        android:background="@color/transparent_dark">
-        <android.support.v7.widget.AppCompatTextView
-            android:id="@+id/description"
-            android:layout_margin="8dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:maxLines="1"
-            android:textSize="16sp"
-            android:textColor="@android:color/white"/>
-        <RelativeLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="32dp"
-            android:layout_alignParentBottom="true">
-
-            <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/recommender"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:textSize="12sp"
-                android:layout_alignParentStart="true"
-                android:text="@string/none"
-                android:textColor="@android:color/white"/>
-
-            <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/publishdate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:textSize="12sp"
-                android:layout_alignParentEnd="true"
-                android:textColor="@android:color/white"/>
-        </RelativeLayout>
-
-    </LinearLayout>
-
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"/>
 </FrameLayout>

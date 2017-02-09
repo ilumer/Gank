@@ -1,7 +1,6 @@
 package com.fast.ilumer.gank.model.viewholder;
 
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.fast.ilumer.gank.R;
@@ -21,7 +20,7 @@ import butterknife.ButterKnife;
 
 public class InfoHolder extends BaseHolder{
     @BindView(R.id.bottom_background)
-    public LinearLayout bottomBackground;
+    public View bottomBackground;
     @BindView(R.id.description)
     TextView mDesc;
     @BindView(R.id.recommender)
@@ -38,19 +37,12 @@ public class InfoHolder extends BaseHolder{
 
     @Override
     public void bindModel(GankInfo info) {
+        super.bindModel(info);
         mDesc.setText(info.getDesc());
         if (info.getWho()!=null) {
             mRecommender.setText(String.format(referFormat,info.getWho()));
         }
         mPublishDate.setText(formatDate(info.getPublishedAt()));
-    }
-
-    public void onAttach(){
-
-    }
-
-    public void onDetach(){
-
     }
 
     private static CharSequence formatDate(Date date){
