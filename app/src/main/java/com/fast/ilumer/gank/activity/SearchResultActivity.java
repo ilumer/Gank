@@ -6,14 +6,22 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 
 import com.fast.ilumer.gank.R;
+import com.fast.ilumer.gank.dao.DbOpenHelper;
 import com.fast.ilumer.gank.fragment.GankTypeFragment;
+import com.fast.ilumer.gank.fragment.RecyclerViewFragment;
+import com.squareup.sqlbrite.BriteDatabase;
+import com.squareup.sqlbrite.SqlBrite;
+
+import rx.schedulers.Schedulers;
 
 /**
  * Created by ${ilumer} on 2/2/17.
  */
 
-public class SearchResultActivity extends BaseActivity {
+public class SearchResultActivity extends BaseActivity implements RecyclerViewFragment.InstanceDb{
     public static final String EXTRA_STRING = "SearchResultActivity.Type";
+    private SqlBrite sqlBrite = new SqlBrite.Builder().build();
+    private BriteDatabase db;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -21,6 +29,7 @@ public class SearchResultActivity extends BaseActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getIntent().getStringExtra(EXTRA_STRING));
+        db = sqlBrite.wrapDatabaseHelper(new DbOpenHelper(this), Schedulers.io());
     }
 
     @Override
@@ -32,5 +41,10 @@ public class SearchResultActivity extends BaseActivity {
     public Fragment createNewFragment() {
         String type = getIntent().getStringExtra(EXTRA_STRING);
         return GankTypeFragment.newInstance(type);
+    }
+
+    @Override
+    public BriteDatabase instance() {
+        return db;
     }
 }
