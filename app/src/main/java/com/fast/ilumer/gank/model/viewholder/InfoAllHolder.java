@@ -14,8 +14,8 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Observable;
-import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * Created by root on 12/26/16.
@@ -26,11 +26,12 @@ public class InfoAllHolder extends InfoPicHolder {
     PageIndicatorView mIndicatorView;
     @BindView(R.id.imageViewPager)
     ViewPager picViewPager;
-    Subscription subscription;
+    CompositeSubscription subscription;
 
     public InfoAllHolder(View itemView) {
         super(itemView);
         ButterKnife.bind(this,itemView);
+        subscription = new CompositeSubscription();
     }
 
     @Override
@@ -76,12 +77,12 @@ public class InfoAllHolder extends InfoPicHolder {
     }
 
     private void startPlay(){
-        subscription = Observable.interval(3, TimeUnit.SECONDS)
+        subscription.add(Observable.interval(3, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aLong -> {
                     int currentPosition = picViewPager.getCurrentItem();
                     currentPosition++;
                     picViewPager.setCurrentItem(currentPosition==picViewPager.getAdapter().getCount()?0:currentPosition);
-                });
+                }));
     }
 }

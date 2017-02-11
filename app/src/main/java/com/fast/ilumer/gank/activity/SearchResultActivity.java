@@ -18,7 +18,7 @@ import rx.schedulers.Schedulers;
  * Created by ${ilumer} on 2/2/17.
  */
 
-public class SearchResultActivity extends BaseActivity implements RecyclerViewFragment.InstanceDb{
+public class SearchResultActivity extends BaseActivity implements RecyclerViewFragment.DbInstance {
     public static final String EXTRA_STRING = "SearchResultActivity.Type";
     private SqlBrite sqlBrite = new SqlBrite.Builder().build();
     private BriteDatabase db;

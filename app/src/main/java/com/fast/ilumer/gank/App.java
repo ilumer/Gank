@@ -10,6 +10,7 @@ import com.facebook.imagepipeline.listener.RequestListener;
 import com.facebook.imagepipeline.listener.RequestLoggingListener;
 import com.facebook.stetho.Stetho;
 import com.squareup.leakcanary.LeakCanary;
+import com.squareup.leakcanary.RefWatcher;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,7 +21,8 @@ import java.util.Set;
 
 public class App extends Application {
 
-    public static Context context;
+    static RefWatcher refWatcher;
+    static Context context;
 
     @Override
     public void onCreate() {
@@ -37,10 +39,14 @@ public class App extends Application {
         if (LeakCanary.isInAnalyzerProcess(this)){
             return;
         }
-        LeakCanary.install(this);
+        refWatcher=LeakCanary.install(this);
     }
 
     public static Context getAppContext(){
         return App.context;
+    }
+
+    public static RefWatcher getRefWatcher(){
+        return refWatcher;
     }
 }

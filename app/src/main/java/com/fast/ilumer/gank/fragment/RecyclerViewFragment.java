@@ -47,6 +47,7 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
     CompositeSubscription mSubscription;
     String type;
     BriteDatabase db;
+    DbInstance dbInstance;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,16 +60,18 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        Log.e("onAttach",TYPE_FLAG);
         try {
-            db = ((InstanceDb) context).instance();
+            dbInstance = ((DbInstance) context);
         }catch (ClassCastException ex){
-            throw new ClassCastException(context.toString() + " must implement InstanceDb");
+            throw new ClassCastException(context.toString() + " must implement DbInstance");
         }
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         Log.e(type,"onViewCreated");
+        db = dbInstance.instance();
         mAdapter = getAdapter(mContentList);
         mContent.setAdapter(mAdapter);
         mContent.setLayoutManager(getLayoutManager());
@@ -136,6 +139,11 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
         }
     };
 
+    @Override
+    public void onDetach() {
+        dbInstance = null;
+        super.onDetach();
+    }
 
     private Observable<List<GankInfo>> getReslut(int page) {
         return RetrofitHelper.getInstance().getGank()
@@ -198,7 +206,7 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
 
     }
 
-    public interface InstanceDb{
+    public interface DbInstance {
         BriteDatabase instance();
     }
 }

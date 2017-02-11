@@ -27,7 +27,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity implements RecyclerViewFragment.InstanceDb{
+public class MainActivity extends AppCompatActivity implements RecyclerViewFragment.DbInstance {
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.tab)
@@ -39,14 +39,13 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewFragm
     private SqlBrite sqlBrite = new SqlBrite.Builder().build();
     private BriteDatabase db;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        db = sqlBrite.wrapDatabaseHelper(new DbOpenHelper(this), Schedulers.io());
         setSupportActionBar(mToolbar);
+        db = sqlBrite.wrapDatabaseHelper(new DbOpenHelper(this), Schedulers.io());
         mToolbar.setTitle(R.string.app_name);
         mViewPager.setAdapter(new ViewPageAdapter(getSupportFragmentManager(),titles));
         mTabLayout.setupWithViewPager(mViewPager);
@@ -87,10 +86,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewFragm
             case R.id.setting:{
                 return true;
             }
-
-
             default:
-            return super.onOptionsItemSelected(item);
+                return super.onOptionsItemSelected(item);
         }
     }
 

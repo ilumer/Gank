@@ -6,6 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.fast.ilumer.gank.App;
+import com.squareup.leakcanary.RefWatcher;
+
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import rx.subscriptions.CompositeSubscription;
@@ -39,5 +42,12 @@ public abstract class BaseFragment extends Fragment {
         super.onDestroyView();
         unbinder.unbind();
         subscription.clear();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        RefWatcher refWatcher = App.getRefWatcher();
+        refWatcher.watch(this);
     }
 }
