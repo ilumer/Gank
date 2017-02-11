@@ -1,5 +1,6 @@
 package com.fast.ilumer.gank.fragment;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,14 +12,12 @@ import android.view.View;
 import com.fast.ilumer.gank.R;
 import com.fast.ilumer.gank.Util;
 import com.fast.ilumer.gank.dao.Db;
-import com.fast.ilumer.gank.dao.DbOpenHelper;
 import com.fast.ilumer.gank.dao.GankInfoContract;
 import com.fast.ilumer.gank.model.GankInfo;
 import com.fast.ilumer.gank.model.ProgressAdapter;
 import com.fast.ilumer.gank.network.RetrofitHelper;
 import com.fast.ilumer.gank.recyclerview.EndlessRecyclerOnScrollListener;
 import com.squareup.sqlbrite.BriteDatabase;
-import com.squareup.sqlbrite.SqlBrite;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +29,6 @@ import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
-import rx.subjects.PublishSubject;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -44,21 +42,28 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
     RecyclerView mContent;
     @BindView(R.id.swipe_refresh)
     SwipeRefreshLayout mSwipeRefreshLayout;
-    private SqlBrite sqlBrite = new SqlBrite.Builder().build();
-    private BriteDatabase db ;
-    private final PublishSubject<Integer> mGankTypeSubject = PublishSubject.create();
     List<GankInfo> mContentList = new ArrayList<>();
     ProgressAdapter mAdapter;
     CompositeSubscription mSubscription;
     String type;
+    BriteDatabase db;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         type = getArguments().getString(TYPE_FLAG);
-        db = sqlBrite.wrapDatabaseHelper(new DbOpenHelper(getActivity()),Schedulers.io());
         mSubscription = new CompositeSubscription();
         Log.e(type,"onCreate");
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            db = ((InstanceDb) context).instance();
+        }catch (ClassCastException ex){
+            throw new ClassCastException(context.toString() + " must implement InstanceDb");
+        }
     }
 
     @Override
@@ -191,5 +196,9 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
 
     protected void addDivider(RecyclerView recyclerView){
 
+    }
+
+    public interface InstanceDb{
+        BriteDatabase instance();
     }
 }

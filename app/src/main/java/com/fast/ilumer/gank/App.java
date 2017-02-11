@@ -9,6 +9,7 @@ import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.imagepipeline.listener.RequestListener;
 import com.facebook.imagepipeline.listener.RequestLoggingListener;
 import com.facebook.stetho.Stetho;
+import com.squareup.leakcanary.LeakCanary;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -33,6 +34,10 @@ public class App extends Application {
         Stetho.initializeWithDefaults(this);
         FLog.setMinimumLoggingLevel(FLog.ERROR);
         context = getApplicationContext();
+        if (LeakCanary.isInAnalyzerProcess(this)){
+            return;
+        }
+        LeakCanary.install(this);
     }
 
     public static Context getAppContext(){

@@ -15,14 +15,19 @@ import android.view.MenuItem;
 
 import com.fast.ilumer.gank.activity.GankTodayActivity;
 import com.fast.ilumer.gank.activity.SearchActivity;
+import com.fast.ilumer.gank.dao.DbOpenHelper;
 import com.fast.ilumer.gank.fragment.GankMeiZiFragment;
 import com.fast.ilumer.gank.fragment.GankTypeFragment;
+import com.fast.ilumer.gank.fragment.RecyclerViewFragment;
+import com.squareup.sqlbrite.BriteDatabase;
+import com.squareup.sqlbrite.SqlBrite;
 
 import butterknife.BindArray;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity implements RecyclerViewFragment.InstanceDb{
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.tab)
@@ -31,6 +36,8 @@ public class MainActivity extends AppCompatActivity{
     ViewPager mViewPager;
     @BindArray(R.array.various_type)
     String[] titles;
+    private SqlBrite sqlBrite = new SqlBrite.Builder().build();
+    private BriteDatabase db;
 
 
     @Override
@@ -38,6 +45,7 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        db = sqlBrite.wrapDatabaseHelper(new DbOpenHelper(this), Schedulers.io());
         setSupportActionBar(mToolbar);
         mToolbar.setTitle(R.string.app_name);
         mViewPager.setAdapter(new ViewPageAdapter(getSupportFragmentManager(),titles));
@@ -84,6 +92,11 @@ public class MainActivity extends AppCompatActivity{
             default:
             return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public BriteDatabase instance() {
+        return db;
     }
 
     public static class ViewPageAdapter extends FragmentStatePagerAdapter {
