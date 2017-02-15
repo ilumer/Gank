@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import com.fast.ilumer.gank.R;
 import com.fast.ilumer.gank.activity.PictureActivity;
+import com.fast.ilumer.gank.model.viewholder.BaseHolder;
 import com.fast.ilumer.gank.model.viewholder.GirlHolder;
 
 import java.util.List;
@@ -34,6 +35,14 @@ public class GirlAdapter extends ProgressAdapter{
     @Override
     public RecyclerView.ViewHolder onCreateExtViewHolder(ViewGroup parent, int viewType) {
         return new GirlHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.gank_girl_pic,parent,false));
+    }
+
+    @Override
+    public void onViewRecycled(RecyclerView.ViewHolder holder) {
+        super.onViewRecycled(holder);
+        if (holder instanceof BaseHolder){
+            ((BaseHolder) holder).onViewRecycled();
+        }
     }
 
     @Override

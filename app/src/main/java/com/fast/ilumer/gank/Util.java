@@ -1,8 +1,8 @@
 package com.fast.ilumer.gank;
 
-import android.graphics.Point;
+import android.content.res.Resources;
+import android.net.Uri;
 import android.util.Log;
-import android.view.Display;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -17,11 +17,6 @@ import java.util.TimeZone;
 
 public class Util {
     private static final String strSeparator= "_,_";
-    public static int getPhoneWidth(Display display){
-        Point size = new Point();
-        display.getSize(size);
-        return size.x;
-    }
 
     private static SimpleDateFormat initFormat(){
         //http://stackoverflow.com/questions/8405087/what-is-this-date-format-2011-08-12t201746-384z
@@ -69,5 +64,31 @@ public class Util {
         //http://stackoverflow.com/questions/344380/why-is-january-month-0-in-java-calendar
         int day = cal.get(Calendar.DAY_OF_MONTH);
         return new int[]{year,month,day};
+    }
+
+    public static int getScreenWidth(){
+        return Resources.getSystem().getDisplayMetrics().widthPixels;
+    }
+
+    public static int getScreenHeight(){
+        return Resources.getSystem().getDisplayMetrics().heightPixels;
+    }
+
+    public static Uri commonImageParse(String url){
+        int width = Math.round(getScreenWidth()/1.618f);
+        String returnUri = url+"?imageView2/0/w/"+width;
+        Log.e("TAGComm",returnUri);
+        return Uri.parse(returnUri);
+    }
+
+
+    /*
+    * 新浪图片不支持压缩
+    * */
+    public static Uri meiZiImageParse(String url, float aspectRatio){
+        int width = getScreenWidth()/3;
+        int height = Math.round(width/aspectRatio);
+        String returnUri = url + "?imageView2/1/w/" + width + "/h/" + height;
+        return Uri.parse(returnUri);
     }
 }

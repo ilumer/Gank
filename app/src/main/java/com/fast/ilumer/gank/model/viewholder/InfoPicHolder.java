@@ -7,6 +7,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.fast.ilumer.gank.R;
+import com.fast.ilumer.gank.Util;
 import com.fast.ilumer.gank.model.GankInfo;
 
 import butterknife.BindColor;
@@ -40,7 +41,7 @@ public class InfoPicHolder extends InfoHolder{
         super.bindModel(item);
         if (imageView!=null) {
             DraweeController controller = Fresco.newDraweeControllerBuilder()
-                    .setUri(item.getImages().get(0))
+                    .setUri(Util.commonImageParse(item.getImages().get(0)))
                     .setAutoPlayAnimations(true)
                     .build();
             imageView.setController(controller);

@@ -119,6 +119,11 @@ public abstract class ProgressAdapter extends
         this.mContentList =mContentList;
     }
 
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
     public abstract int getItemViewTypeExt(int position);
     public abstract RecyclerView.ViewHolder onCreateExtViewHolder(ViewGroup parent, int viewType);
     public abstract void onBindExtViewHolder(RecyclerView.ViewHolder holder, GankInfo info);

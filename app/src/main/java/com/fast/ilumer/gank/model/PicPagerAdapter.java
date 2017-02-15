@@ -10,6 +10,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.fast.ilumer.gank.R;
+import com.fast.ilumer.gank.Util;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class PicPagerAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         View view = LayoutInflater.from(container.getContext()).inflate(R.layout.gank_pager_pic,container,false);
-        Uri uri = Uri.parse(imageList.get(position));
+        Uri uri = Util.commonImageParse(imageList.get(position));
         DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setUri(uri)
                 .setAutoPlayAnimations(true)

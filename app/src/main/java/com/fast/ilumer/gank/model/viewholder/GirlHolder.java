@@ -4,6 +4,7 @@ import android.view.View;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.fast.ilumer.gank.R;
+import com.fast.ilumer.gank.Util;
 import com.fast.ilumer.gank.model.GankInfo;
 
 import butterknife.BindView;
@@ -25,8 +26,14 @@ public class GirlHolder extends BaseHolder{
     @Override
     public void bindModel(GankInfo info) {
         super.bindModel(info);
-        imageView.setImageURI(info.getUrl());
+        imageView.setImageURI(Util.meiZiImageParse(info.getUrl(),aspectRatio));
         imageView.setAspectRatio(aspectRatio);
+    }
+
+    @Override
+    public void onViewRecycled() {
+        super.onViewRecycled();
+        imageView.setImageBitmap(null);
     }
 
     public void setAspectRatio(float aspectRatio){

@@ -86,6 +86,7 @@ public abstract class RecyclerViewFragment extends BaseFragment
         Log.e(type,"onViewCreated");
         db = dbInstance.instance();
         mAdapter = getAdapter(mContentList);
+        mAdapter.setHasStableIds(true);
         mContent.setAdapter(mAdapter);
         mContent.setLayoutManager(getLayoutManager());
         addDivider(mContent);
@@ -96,6 +97,10 @@ public abstract class RecyclerViewFragment extends BaseFragment
                 loadMore(page);
             }
         };
+        mContent.setHasFixedSize(true);
+        mContent.setItemViewCacheSize(20);
+        mContent.setDrawingCacheEnabled(true);
+        mContent.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         mContent.addOnScrollListener(scrollListener);
         if (savedInstanceState!=null){
             mContent.getLayoutManager().onRestoreInstanceState(layoutManagerState);
@@ -103,6 +108,7 @@ public abstract class RecyclerViewFragment extends BaseFragment
             subscription.add(db.createQuery(Db.TYPE_TABLE_NAME, "select * from " + Db.TYPE_TABLE_NAME + " where " + GankInfoContract.GankEntry.TYPE + " = ?", type)
                     .mapToOne(mapToList)
                     .filter(list -> list.size() != 0)
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(list -> {
                         if (mContentList.size() >= 10) {

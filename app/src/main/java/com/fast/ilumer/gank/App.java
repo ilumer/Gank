@@ -9,6 +9,7 @@ import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.imagepipeline.listener.RequestListener;
 import com.facebook.imagepipeline.listener.RequestLoggingListener;
 import com.facebook.stetho.Stetho;
+import com.hugo.watcher.Watcher;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 
@@ -40,6 +41,7 @@ public class App extends Application {
             return;
         }
         refWatcher=LeakCanary.install(this);
+        Watcher.getInstance().start(this);
     }
 
     public static Context getAppContext(){

@@ -23,6 +23,10 @@ public class BaseHolder extends RecyclerView.ViewHolder {
 
     }
 
+    public void onViewRecycled(){
+
+    }
+
     public void bindModel(GankInfo info){
 
     }
