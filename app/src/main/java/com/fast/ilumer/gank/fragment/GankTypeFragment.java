@@ -20,7 +20,7 @@ public class GankTypeFragment extends RecyclerViewFragment{
 
     public static GankTypeFragment newInstance(String type){
         Bundle args = new Bundle();
-        args.putString(TYPE_FLAG,type);
+        args.putString(EXTRA_TYPE,type);
         GankTypeFragment frgment = new GankTypeFragment();
         frgment.setArguments(args);
         return frgment;

@@ -46,4 +46,21 @@ public class InfoPicHolder extends InfoHolder{
             imageView.setController(controller);
         }
     }
+
+    @Override
+    public void onAttach() {
+        super.onAttach();
+        if (imageView.getController().getAnimatable()!=null) {
+            imageView.getController().getAnimatable().start();
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (imageView.getController().getAnimatable()!=null) {
+            imageView.getController().getAnimatable().stop();
+        }
+    }
+
 }

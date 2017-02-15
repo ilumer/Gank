@@ -3,6 +3,7 @@ package com.fast.ilumer.gank.fragment;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
@@ -36,31 +37,43 @@ import rx.subscriptions.CompositeSubscription;
  * init base recyclerView with swipefragment Fragment
  */
 
-public abstract class RecyclerViewFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener{
-    public static final String TYPE_FLAG = "RecyclerViewFragment.Type";
+public abstract class RecyclerViewFragment extends BaseFragment
+        implements SwipeRefreshLayout.OnRefreshListener{
+    public static final String EXTRA_TYPE = "RecyclerViewFragment.Type";
+    public static final String EXTRA_LIST = "RecyclerViewFragment.List";
+    public static final String EXTRA_LAYOUTMANAGER_STATE = "RecyclerViewFragment.LayoutManagerState";
+    public static final String EXTRA_PAGE = "RecyclerViewFragment.PAGE";
     @BindView(R.id.content)
     RecyclerView mContent;
     @BindView(R.id.swipe_refresh)
     SwipeRefreshLayout mSwipeRefreshLayout;
     List<GankInfo> mContentList = new ArrayList<>();
+    int currentPage = 1;
     ProgressAdapter mAdapter;
-    CompositeSubscription mSubscription;
+
     String type;
     BriteDatabase db;
     DbInstance dbInstance;
+    Parcelable layoutManagerState;
+    EndlessRecyclerOnScrollListener scrollListener;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        type = getArguments().getString(TYPE_FLAG);
-        mSubscription = new CompositeSubscription();
+        type = getArguments().getString(EXTRA_TYPE);
+        subscription = new CompositeSubscription();
         Log.e(type,"onCreate");
+        if (savedInstanceState!=null){
+            mContentList = savedInstanceState.getParcelableArrayList(EXTRA_LIST);
+            layoutManagerState = savedInstanceState.getParcelable(EXTRA_LAYOUTMANAGER_STATE);
+            currentPage = savedInstanceState.getInt(EXTRA_PAGE);
+        }
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Log.e("onAttach",TYPE_FLAG);
+        Log.e("onAttach", EXTRA_TYPE);
         try {
             dbInstance = ((DbInstance) context);
         }catch (ClassCastException ex){
@@ -75,40 +88,51 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
         mAdapter = getAdapter(mContentList);
         mContent.setAdapter(mAdapter);
         mContent.setLayoutManager(getLayoutManager());
-        mContent.addOnScrollListener(new EndlessRecyclerOnScrollListener(mContent.getLayoutManager()) {
-            @Override
-            public void onLoadMore(int page) {
-                mSubscription.add(getReslut(page)
-                        .doOnSubscribe(mAdapter)
-                        .subscribeOn(AndroidSchedulers.mainThread())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(mAdapter));
-            }
-        });
         addDivider(mContent);
         mSwipeRefreshLayout.setOnRefreshListener(this);
-        mSubscription.add(db.createQuery(Db.TYPE_TABLE_NAME,"select * from "+Db.TYPE_TABLE_NAME+" where "+GankInfoContract.GankEntry.TYPE+" = ?",type)
-               .mapToOne(mapToList)
-               .filter(list -> list.size()!=0)
-               .observeOn(AndroidSchedulers.mainThread())
-               .subscribe(list -> {
-                   if (mContentList.size()>=10){
-                       for (int i= 0;i<list.size();i++){
-                           mContentList.set(i,list.get(i));
-                       }
-                   }else {
-                       mContentList.addAll(list);
-                   }
-                   mAdapter.notifyDataSetChanged();
-               }));
-        onRefresh();
+        scrollListener = new EndlessRecyclerOnScrollListener(currentPage,mContent.getLayoutManager()) {
+            @Override
+            public void onLoadMore(int page) {
+                loadMore(page);
+            }
+        };
+        mContent.addOnScrollListener(scrollListener);
+        if (savedInstanceState!=null){
+            mContent.getLayoutManager().onRestoreInstanceState(layoutManagerState);
+        }else {
+            subscription.add(db.createQuery(Db.TYPE_TABLE_NAME, "select * from " + Db.TYPE_TABLE_NAME + " where " + GankInfoContract.GankEntry.TYPE + " = ?", type)
+                    .mapToOne(mapToList)
+                    .filter(list -> list.size() != 0)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(list -> {
+                        if (mContentList.size() >= 10) {
+                            for (int i = 0; i < list.size(); i++) {
+                                mContentList.set(i, list.get(i));
+                            }
+                        } else {
+                            mContentList.addAll(list);
+                        }
+                        mAdapter.notifyDataSetChanged();
+                    }));
+            onRefresh();
+        }
+    }
+
+    public void loadMore(int page){
+        subscription.add(getReslut(page)
+                .doOnSubscribe(mAdapter)
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(mAdapter));
     }
 
     @Override
-    public void onDestroyView() {
-        Log.e(type,"onDestoryView");
-        super.onDestroyView();
-        mSubscription.clear();
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        layoutManagerState = mContent.getLayoutManager().onSaveInstanceState();
+        outState.putParcelable(EXTRA_LAYOUTMANAGER_STATE,layoutManagerState);
+        outState.putParcelableArrayList(EXTRA_LIST,(ArrayList<? extends Parcelable>) mContentList);
+        outState.putInt(EXTRA_PAGE,scrollListener.getCurrentPage());
     }
 
     private final Func1<Cursor, List<GankInfo>> mapToList = new Func1<Cursor, List<GankInfo>>() {
@@ -145,6 +169,11 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
         super.onDetach();
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
     private Observable<List<GankInfo>> getReslut(int page) {
         return RetrofitHelper.getInstance().getGank()
                 .gankTypeInfo(type, 10, page)
@@ -152,10 +181,12 @@ public abstract class RecyclerViewFragment extends BaseFragment implements Swipe
                 .subscribeOn(Schedulers.io());
     }
 
+
+
     @Override
     public void onRefresh() {
         mSwipeRefreshLayout.setRefreshing(true);
-        mSubscription.add(getReslut(1)
+        subscription.add(getReslut(1)
                 .filter(list -> !mContentList.containsAll(list))
                 .map(list -> {
                     BriteDatabase.Transaction transaction = db.newTransaction();

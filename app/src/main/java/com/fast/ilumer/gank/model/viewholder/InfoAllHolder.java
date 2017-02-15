@@ -11,27 +11,37 @@ import com.rd.PageIndicatorView;
 
 import java.util.concurrent.TimeUnit;
 
+import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Observable;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.subscriptions.CompositeSubscription;
 
 /**
  * Created by root on 12/26/16.
  */
 
-public class InfoAllHolder extends InfoPicHolder {
+public class InfoAllHolder extends InfoHolder {
     @BindView(R.id.pageIndicatorView)
     PageIndicatorView mIndicatorView;
     @BindView(R.id.imageViewPager)
     ViewPager picViewPager;
-    CompositeSubscription subscription;
+    @BindColor(R.color.transparent_dark)
+    int transparentDark;
+    @BindColor(android.R.color.white)
+    int white;
+    PicPagerAdapter picPagerAdapter;
+    Subscription subscription = null;
 
     public InfoAllHolder(View itemView) {
         super(itemView);
         ButterKnife.bind(this,itemView);
-        subscription = new CompositeSubscription();
+        bottomBackground.setBackgroundColor(transparentDark);
+        mDesc.setTextColor(white);
+        mDesc.setMaxLines(1);
+        mRecommender.setTextColor(white);
+        mPublishDate.setTextColor(white);
     }
 
     @Override
@@ -52,7 +62,8 @@ public class InfoAllHolder extends InfoPicHolder {
             }
             return false;
         }));
-        picViewPager.setAdapter(new PicPagerAdapter(item.getImages()));
+        picPagerAdapter = new PicPagerAdapter(item.getImages());
+        picViewPager.setAdapter(picPagerAdapter);
         mIndicatorView.setViewPager(picViewPager);
         mIndicatorView.setCount(picViewPager.getAdapter().getCount());
         mIndicatorView.setSelection(picViewPager.getCurrentItem());
@@ -71,18 +82,21 @@ public class InfoAllHolder extends InfoPicHolder {
     }
 
     private void stopPlay(){
-        if (!subscription.isUnsubscribed()) {
+        if (subscription!=null) {
             subscription.unsubscribe();
         }
     }
 
     private void startPlay(){
-        subscription.add(Observable.interval(3, TimeUnit.SECONDS)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(aLong -> {
-                    int currentPosition = picViewPager.getCurrentItem();
-                    currentPosition++;
-                    picViewPager.setCurrentItem(currentPosition==picViewPager.getAdapter().getCount()?0:currentPosition);
-                }));
+        if (subscription==null || subscription.isUnsubscribed()){
+            subscription =
+                    Observable.interval(3, TimeUnit.SECONDS)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(aLong -> {
+                                int currentPosition = picViewPager.getCurrentItem();
+                                currentPosition++;
+                                picViewPager.setCurrentItem(currentPosition == picViewPager.getAdapter().getCount() ? 0 : currentPosition);
+                            });
+        }
     }
 }

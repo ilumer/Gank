@@ -28,6 +28,11 @@ public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScr
         this.mLayoutManager = layoutManager;
     }
 
+    public EndlessRecyclerOnScrollListener(int currentPage, RecyclerView.LayoutManager mLayoutManager) {
+        this.currentPage = currentPage;
+        this.mLayoutManager = mLayoutManager;
+    }
+
     public EndlessRecyclerOnScrollListener(LinearLayoutManager layoutManager) {
         this.mLayoutManager = layoutManager;
     }
@@ -69,7 +74,7 @@ public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScr
             lastVisibleItemPosition = getLastVisibleItem(lastVisibleItemPositions);
         } else if (mLayoutManager instanceof LinearLayoutManager) {
             lastVisibleItemPosition = ((LinearLayoutManager) mLayoutManager).findLastVisibleItemPosition();
-        } else if (mLayoutManager instanceof GridLayoutManager) {
+        } else if (                                                                                                                              mLayoutManager instanceof GridLayoutManager) {
             lastVisibleItemPosition = ((GridLayoutManager) mLayoutManager).findLastVisibleItemPosition();
         }
 
@@ -100,6 +105,10 @@ public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScr
             onLoadMore(currentPage);
             loading = true;
         }
+    }
+
+    public int getCurrentPage(){
+        return currentPage;
     }
 
     // Defines the process for actually loading more data based on page

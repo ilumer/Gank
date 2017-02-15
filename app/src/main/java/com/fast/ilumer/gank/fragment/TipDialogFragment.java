@@ -35,7 +35,7 @@ public class TipDialogFragment  extends DialogFragment{
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(content);
-        // Create the AlertDialog object and return it
+        // Create the AlertDialog object and return i
         return builder.create();
     }
 }

@@ -1,6 +1,8 @@
 package com.fast.ilumer.gank.model;
 
 import android.content.ContentValues;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.fast.ilumer.gank.Util;
 import com.fast.ilumer.gank.dao.GankInfoContract;
@@ -12,7 +14,7 @@ import java.util.List;
  * Created by root on 10/15/16.
  */
 
-public class GankInfo {
+public class GankInfo implements Parcelable{
 
     private int datebaseId = -1;
     //对应数据库中的唯一字段
@@ -146,4 +148,53 @@ public class GankInfo {
     }
 
     //没有重载hashcode;
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.datebaseId);
+        dest.writeString(this._id);
+        dest.writeString(this.url);
+        dest.writeLong(this.publishedAt != null ? this.publishedAt.getTime() : -1);
+        dest.writeLong(this.createdAt != null ? this.createdAt.getTime() : -1);
+        dest.writeString(this.who);
+        dest.writeString(this.desc);
+        dest.writeString(this.type);
+        dest.writeByte(this.used ? (byte) 1 : (byte) 0);
+        dest.writeStringList(this.images);
+    }
+
+    public GankInfo() {
+    }
+
+    protected GankInfo(Parcel in) {
+        this.datebaseId = in.readInt();
+        this._id = in.readString();
+        this.url = in.readString();
+        long tmpPublishedAt = in.readLong();
+        this.publishedAt = tmpPublishedAt == -1 ? null : new Date(tmpPublishedAt);
+        long tmpCreatedAt = in.readLong();
+        this.createdAt = tmpCreatedAt == -1 ? null : new Date(tmpCreatedAt);
+        this.who = in.readString();
+        this.desc = in.readString();
+        this.type = in.readString();
+        this.used = in.readByte() != 0;
+        this.images = in.createStringArrayList();
+    }
+
+    public static final Creator<GankInfo> CREATOR = new Creator<GankInfo>() {
+        @Override
+        public GankInfo createFromParcel(Parcel source) {
+            return new GankInfo(source);
+        }
+
+        @Override
+        public GankInfo[] newArray(int size) {
+            return new GankInfo[size];
+        }
+    };
 }

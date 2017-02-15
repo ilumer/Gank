@@ -20,7 +20,7 @@ public class GankMeiZiFragment extends RecyclerViewFragment{
 
     public static GankMeiZiFragment newInstance(String type){
         Bundle args = new Bundle();
-        args.putString(TYPE_FLAG,type);
+        args.putString(EXTRA_TYPE,type);
         GankMeiZiFragment frgment = new GankMeiZiFragment();
         frgment.setArguments(args);
         return frgment;
