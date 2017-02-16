@@ -54,6 +54,7 @@ public abstract class RecyclerViewFragment extends BaseFragment
     String type;
     BriteDatabase db;
     DbInstance dbInstance;
+    RecyclerView.RecycledViewPool pool = null;
     Parcelable layoutManagerState;
     EndlessRecyclerOnScrollListener scrollListener;
 
@@ -79,6 +80,12 @@ public abstract class RecyclerViewFragment extends BaseFragment
         }catch (ClassCastException ex){
             throw new ClassCastException(context.toString() + " must implement DbInstance");
         }
+        try{
+            pool = ((PoolInstance) context).getInstance();
+            //not must implement
+        }catch (ClassCastException ex){
+
+        }
     }
 
     @Override
@@ -96,7 +103,11 @@ public abstract class RecyclerViewFragment extends BaseFragment
             public void onLoadMore(int page) {
                 loadMore(page);
             }
+
         };
+        if (pool!=null){
+            mContent.setRecycledViewPool(pool);
+        }
         mContent.setHasFixedSize(true);
         mContent.setItemViewCacheSize(20);
         mContent.setDrawingCacheEnabled(true);
@@ -172,6 +183,7 @@ public abstract class RecyclerViewFragment extends BaseFragment
     @Override
     public void onDetach() {
         dbInstance = null;
+        pool = null;
         super.onDetach();
     }
 
@@ -245,5 +257,9 @@ public abstract class RecyclerViewFragment extends BaseFragment
 
     public interface DbInstance {
         BriteDatabase instance();
+    }
+
+    public interface PoolInstance{
+        RecyclerView.RecycledViewPool getInstance();
     }
 }

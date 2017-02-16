@@ -18,7 +18,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class RetrofitHelper {
-    private OkHttpClient client;
+    private static OkHttpClient client;
     private Retrofit retrofit;
 
     private RetrofitHelper(){
@@ -39,7 +39,7 @@ public class RetrofitHelper {
         return retrofit.create(Gank.class);
     }
 
-    private void initClient(){
+    public static OkHttpClient initClient(){
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         int cacheSize = 10*10*1024;
@@ -49,6 +49,7 @@ public class RetrofitHelper {
                 .addNetworkInterceptor(new StethoInterceptor())
                 .addInterceptor(interceptor)
                 .build();
+        return client;
     }
 
     private static class LazyHelper{

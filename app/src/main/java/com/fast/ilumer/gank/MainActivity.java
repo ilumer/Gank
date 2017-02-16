@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,7 +28,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity implements RecyclerViewFragment.DbInstance {
+public class MainActivity extends AppCompatActivity
+        implements RecyclerViewFragment.DbInstance, RecyclerViewFragment.PoolInstance{
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.tab)
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewFragm
     String[] titles;
     private SqlBrite sqlBrite = new SqlBrite.Builder().build();
     private BriteDatabase db;
+    private RecyclerView.RecycledViewPool pool;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewFragm
         mToolbar.setTitle(R.string.app_name);
         mViewPager.setAdapter(new ViewPageAdapter(getSupportFragmentManager(),titles));
         mTabLayout.setupWithViewPager(mViewPager);
+        pool = new RecyclerView.RecycledViewPool();
     }
 
     @Override
@@ -71,7 +75,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewFragm
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
+        switch (item
+                .getItemId()) {
             case R.id.today_gank:{
                 Intent i = new Intent(this, GankTodayActivity.class);
                 startActivity(i);
@@ -92,8 +97,19 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewFragm
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        pool = null;
+    }
+
+    @Override
     public BriteDatabase instance() {
         return db;
+    }
+
+    @Override
+    public RecyclerView.RecycledViewPool getInstance() {
+        return pool;
     }
 
     public static class ViewPageAdapter extends FragmentStatePagerAdapter {

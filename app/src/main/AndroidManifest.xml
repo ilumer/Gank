@@ -32,7 +32,7 @@
             android:name=".dao.GankProvider"
             android:exported="false"/>
 
-        <service android:name="com.hugo.watcher.WatcherService"/>
+
 
     </application>
 

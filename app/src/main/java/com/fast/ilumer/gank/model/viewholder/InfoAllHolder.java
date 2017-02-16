@@ -56,7 +56,7 @@ public class InfoAllHolder extends InfoHolder {
                 }
                 case MotionEvent.ACTION_CANCEL:
                 case MotionEvent.ACTION_UP:{
-                    startPlay();
+  //                  startPlay();
                     break;
                 }
             }
@@ -72,7 +72,7 @@ public class InfoAllHolder extends InfoHolder {
     @Override
     public void onAttach() {
         super.onAttach();
-        startPlay();
+//        startPlay();
     }
 
     @Override

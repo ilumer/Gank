@@ -19,7 +19,7 @@ import java.util.List;
  */
 
 public class GirlAdapter extends ProgressAdapter{
-    public static final int GANK_VIEW_GIRL = 1;
+    public static final int GANK_VIEW_GIRL = 4;
     private Activity host;
 
     public GirlAdapter(List<GankInfo> mContentList, Activity activity) {
