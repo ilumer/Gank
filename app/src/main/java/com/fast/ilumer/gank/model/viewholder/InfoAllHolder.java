@@ -1,15 +1,18 @@
 package com.fast.ilumer.gank.model.viewholder;
 
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import com.fast.ilumer.gank.R;
 import com.fast.ilumer.gank.model.GankInfo;
 import com.fast.ilumer.gank.model.PicPagerAdapter;
+import com.fast.ilumer.gank.rx.SubscriptionManager;
 import com.rd.PageIndicatorView;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
 
 import butterknife.BindColor;
 import butterknife.BindView;
@@ -32,6 +35,7 @@ public class InfoAllHolder extends InfoHolder {
     @BindColor(android.R.color.white)
     int white;
     PicPagerAdapter picPagerAdapter;
+    GankInfo info;
     Subscription subscription = null;
 
     public InfoAllHolder(View itemView) {
@@ -47,6 +51,7 @@ public class InfoAllHolder extends InfoHolder {
     @Override
     public void bindModel(GankInfo item) {
         super.bindModel(item);
+        info =  item;
         picViewPager.setOnTouchListener(((v, event) -> {
             switch (event.getAction()){
                 case MotionEvent.ACTION_DOWN:
@@ -56,7 +61,7 @@ public class InfoAllHolder extends InfoHolder {
                 }
                 case MotionEvent.ACTION_CANCEL:
                 case MotionEvent.ACTION_UP:{
-  //                  startPlay();
+                    startPlay();
                     break;
                 }
             }
@@ -72,7 +77,7 @@ public class InfoAllHolder extends InfoHolder {
     @Override
     public void onAttach() {
         super.onAttach();
-//        startPlay();
+        startPlay();
     }
 
     @Override
@@ -93,10 +98,12 @@ public class InfoAllHolder extends InfoHolder {
                     Observable.interval(3, TimeUnit.SECONDS)
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(aLong -> {
+                                Log.e("TAG","leak");
                                 int currentPosition = picViewPager.getCurrentItem();
                                 currentPosition++;
                                 picViewPager.setCurrentItem(currentPosition == picViewPager.getAdapter().getCount() ? 0 : currentPosition);
                             });
+            SubscriptionManager.get().put(info.getUrl(),subscription);
         }
     }
 }

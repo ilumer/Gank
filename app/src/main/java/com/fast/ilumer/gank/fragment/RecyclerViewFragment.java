@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
+import com.fast.ilumer.gank.App;
 import com.fast.ilumer.gank.R;
 import com.fast.ilumer.gank.Util;
 import com.fast.ilumer.gank.dao.Db;
@@ -18,6 +19,7 @@ import com.fast.ilumer.gank.model.GankInfo;
 import com.fast.ilumer.gank.model.ProgressAdapter;
 import com.fast.ilumer.gank.network.RetrofitHelper;
 import com.fast.ilumer.gank.recyclerview.EndlessRecyclerOnScrollListener;
+import com.fast.ilumer.gank.rx.SubscriptionManager;
 import com.squareup.sqlbrite.BriteDatabase;
 
 import java.util.ArrayList;
@@ -54,7 +56,6 @@ public abstract class RecyclerViewFragment extends BaseFragment
     String type;
     BriteDatabase db;
     DbInstance dbInstance;
-    RecyclerView.RecycledViewPool pool = null;
     Parcelable layoutManagerState;
     EndlessRecyclerOnScrollListener scrollListener;
 
@@ -77,14 +78,8 @@ public abstract class RecyclerViewFragment extends BaseFragment
         Log.e("onAttach", EXTRA_TYPE);
         try {
             dbInstance = ((DbInstance) context);
-        }catch (ClassCastException ex){
+        }catch (ClassCastException ex) {
             throw new ClassCastException(context.toString() + " must implement DbInstance");
-        }
-        try{
-            pool = ((PoolInstance) context).getInstance();
-            //not must implement
-        }catch (ClassCastException ex){
-
         }
     }
 
@@ -105,13 +100,8 @@ public abstract class RecyclerViewFragment extends BaseFragment
             }
 
         };
-        if (pool!=null){
-            mContent.setRecycledViewPool(pool);
-        }
+        mContent.setRecycledViewPool(App.getPool());
         mContent.setHasFixedSize(true);
-        mContent.setItemViewCacheSize(20);
-        mContent.setDrawingCacheEnabled(true);
-        mContent.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         mContent.addOnScrollListener(scrollListener);
         if (savedInstanceState!=null){
             mContent.getLayoutManager().onRestoreInstanceState(layoutManagerState);
@@ -133,6 +123,11 @@ public abstract class RecyclerViewFragment extends BaseFragment
                     }));
             onRefresh();
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
     }
 
     public void loadMore(int page){
@@ -183,13 +178,13 @@ public abstract class RecyclerViewFragment extends BaseFragment
     @Override
     public void onDetach() {
         dbInstance = null;
-        pool = null;
         super.onDetach();
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        SubscriptionManager.get().cancel();
     }
 
     private Observable<List<GankInfo>> getReslut(int page) {
@@ -259,7 +254,4 @@ public abstract class RecyclerViewFragment extends BaseFragment
         BriteDatabase instance();
     }
 
-    public interface PoolInstance{
-        RecyclerView.RecycledViewPool getInstance();
-    }
 }

@@ -29,7 +29,7 @@ import butterknife.ButterKnife;
 import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity
-        implements RecyclerViewFragment.DbInstance, RecyclerViewFragment.PoolInstance{
+        implements RecyclerViewFragment.DbInstance{
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.tab)
@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity
     String[] titles;
     private SqlBrite sqlBrite = new SqlBrite.Builder().build();
     private BriteDatabase db;
-    private RecyclerView.RecycledViewPool pool;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +51,6 @@ public class MainActivity extends AppCompatActivity
         mToolbar.setTitle(R.string.app_name);
         mViewPager.setAdapter(new ViewPageAdapter(getSupportFragmentManager(),titles));
         mTabLayout.setupWithViewPager(mViewPager);
-        pool = new RecyclerView.RecycledViewPool();
     }
 
     @Override
@@ -99,17 +97,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
-        pool = null;
     }
 
     @Override
     public BriteDatabase instance() {
         return db;
-    }
-
-    @Override
-    public RecyclerView.RecycledViewPool getInstance() {
-        return pool;
     }
 
     public static class ViewPageAdapter extends FragmentStatePagerAdapter {

@@ -3,6 +3,7 @@ package com.fast.ilumer.gank;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.v7.widget.RecyclerView;
 
 import com.facebook.common.logging.FLog;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -26,11 +27,13 @@ public class App extends Application {
 
     static RefWatcher refWatcher;
     static Context context;
+    static RecyclerView.RecycledViewPool pool;
 
     @Override
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
+        pool = new RecyclerView.RecycledViewPool();
         Set<RequestListener> requestListeners = new HashSet<>();
         requestListeners.add(new RequestLoggingListener());
         ImagePipelineConfig config = OkHttpImagePipelineConfigFactory
@@ -53,5 +56,9 @@ public class App extends Application {
 
     public static RefWatcher getRefWatcher(){
         return refWatcher;
+    }
+
+    public static RecyclerView.RecycledViewPool getPool() {
+        return pool;
     }
 }
