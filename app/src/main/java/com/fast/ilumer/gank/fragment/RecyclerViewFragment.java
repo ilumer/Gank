@@ -101,7 +101,6 @@ public abstract class RecyclerViewFragment extends BaseFragment
             }
 
         };
-        mContent.setRecycledViewPool(App.getPool());
         mContent.setHasFixedSize(true);
         mContent.addOnScrollListener(scrollListener);
         if (savedInstanceState!=null){

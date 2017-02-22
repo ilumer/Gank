@@ -28,13 +28,11 @@ public class App extends Application {
 
     static RefWatcher refWatcher;
     static Context context;
-    static RecyclerView.RecycledViewPool pool;
 
     @Override
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
-        pool = new RecyclerView.RecycledViewPool();
         Set<RequestListener> requestListeners = new HashSet<>();
         requestListeners.add(new RequestLoggingListener());
         DiskCacheConfig diskCacheConfig = DiskCacheConfig.newBuilder(this)
@@ -63,7 +61,4 @@ public class App extends Application {
         return refWatcher;
     }
 
-    public static RecyclerView.RecycledViewPool getPool() {
-        return pool;
-    }
 }

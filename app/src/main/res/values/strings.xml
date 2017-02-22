@@ -33,11 +33,8 @@
     <string name="load_with_webview_key" translatable="false">load_with_webview</string>
     <string name="load_with_webview_summary">以WebView的方式浏览网页</string>
     <string name="load_with_webview_title">浏览方式</string>
-    <string name="data_usage_key" translatable="false">network_consume_key</string>
-    <string name="data_usage_summary">移动数据消耗 %d kb</string>
-    <string name="data_usage_title">移动数据</string>
     <string name="about">关于</string>
     <string name="open_source">开源</string>
     <string name="read_code">查看github</string>
-    <string name="github_address">https://goo.gl/T4CDoA</string>
+    <string name="github_address">https://github.com/ilumer/Gank</string>
 </resources>

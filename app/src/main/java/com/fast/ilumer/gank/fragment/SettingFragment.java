@@ -22,13 +22,10 @@ import rx.subscriptions.CompositeSubscription;
 public class SettingFragment extends PreferenceFragmentCompat {
     CompositeSubscription subscription = null;
     Preference deleteCache;
-    Preference dataUsage;
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.setting_preference);
         deleteCache = findPreference(getString(R.string.delete));
-        dataUsage = findPreference(getString(R.string.data_usage_key));
-        dataUsage.setSummary(String.format(getString(R.string.data_usage_summary),mobileDataUsage()));
         showCache();
         subscription = new CompositeSubscription();
         deleteCache.setOnPreferenceClickListener(preference -> {
@@ -48,10 +45,6 @@ public class SettingFragment extends PreferenceFragmentCompat {
     public void onDestroyView() {
         super.onDestroyView();
             subscription.unsubscribe();
-    }
-
-    public long mobileDataUsage(){
-        return Math.round((TrafficStats.getMobileRxBytes()+TrafficStats.getMobileTxBytes())/1024);
     }
 
     public int getImageDiskCache(){
