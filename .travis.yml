@@ -8,8 +8,8 @@ sudo: false         # 开启基于容器的Travis CI任务，让编译效率更�
 android:            # 配置信息
   components:
     - tools
-    - build-tools-24.0.2
-    - android-24
+    - build-tools-25.0.2
+    - android-25
     - extra-android-m2repository     # Android Support Repository
     - extra-android-support          # Support Library
 

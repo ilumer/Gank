@@ -20,7 +20,24 @@
     <string name="no_gank">抱歉今天还没有干货啊</string>
     <string name="update_gank">抱歉今天的干货还没有更新</string>
     <string name="error_network">检测你的网络是否出现了问题,你的干货被谁吃了</string>
-    <string name="search_hint">serach gank</string>
-    <string name="action_search">serach</string>
+    <string name="search_hint">search gank</string>
+    <string name="action_search">search</string>
     <string name="content_authority">com.fast.ilumer.gank</string>
+    <string name="basic_setting">基本设置</string>
+    <string name="delete">删除图片缓存</string>
+    <string name="image_cache">图片缓存</string>
+    <string name="delete_summary">图片缓存大小为 %d kb</string>
+    <string name="info_loader">加载方式</string>
+    <string name="no_img_info">无图加载</string>
+    <string name="no_img_info_key" translatable="false">no_img_info_key</string>
+    <string name="load_with_webview_key" translatable="false">load_with_webview</string>
+    <string name="load_with_webview_summary">以WebView的方式浏览网页</string>
+    <string name="load_with_webview_title">浏览方式</string>
+    <string name="data_usage_key" translatable="false">network_consume_key</string>
+    <string name="data_usage_summary">移动数据消耗 %d kb</string>
+    <string name="data_usage_title">移动数据</string>
+    <string name="about">关于</string>
+    <string name="open_source">开源</string>
+    <string name="read_code">查看github</string>
+    <string name="github_address">https://goo.gl/T4CDoA</string>
 </resources>

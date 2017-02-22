@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 
+import com.facebook.cache.disk.DiskCacheConfig;
 import com.facebook.common.logging.FLog;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory;
@@ -36,9 +37,13 @@ public class App extends Application {
         pool = new RecyclerView.RecycledViewPool();
         Set<RequestListener> requestListeners = new HashSet<>();
         requestListeners.add(new RequestLoggingListener());
+        DiskCacheConfig diskCacheConfig = DiskCacheConfig.newBuilder(this)
+                .setIndexPopulateAtStartupEnabled(true)
+                .build();
         ImagePipelineConfig config = OkHttpImagePipelineConfigFactory
                 .newBuilder(this, RetrofitHelper.initClient())
                 .setBitmapsConfig(Bitmap.Config.RGB_565)
+                .setMainDiskCacheConfig(diskCacheConfig)
                 .setRequestListeners(requestListeners)
                 .build();
         Fresco.initialize(this, config);

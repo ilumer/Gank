@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -136,6 +137,10 @@ public abstract class RecyclerViewFragment extends BaseFragment
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(mAdapter));
+    }
+
+    public RecyclerView.Adapter getAdapter(){
+        return mContent.getAdapter();
     }
 
     @Override

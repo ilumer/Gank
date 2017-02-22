@@ -98,7 +98,6 @@ public class InfoAllHolder extends InfoHolder {
                     Observable.interval(3, TimeUnit.SECONDS)
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(aLong -> {
-                                Log.e("TAG","leak");
                                 int currentPosition = picViewPager.getCurrentItem();
                                 currentPosition++;
                                 picViewPager.setCurrentItem(currentPosition == picViewPager.getAdapter().getCount() ? 0 : currentPosition);

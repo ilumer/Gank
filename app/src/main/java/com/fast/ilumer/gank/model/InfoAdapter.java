@@ -1,6 +1,7 @@
 package com.fast.ilumer.gank.model;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.v7.widget.RecyclerView;
@@ -8,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.fast.ilumer.gank.R;
+import com.fast.ilumer.gank.Util;
+import com.fast.ilumer.gank.activity.WebViewActivity;
 import com.fast.ilumer.gank.model.viewholder.InfoAllHolder;
 import com.fast.ilumer.gank.model.viewholder.InfoHolder;
 import com.fast.ilumer.gank.model.viewholder.InfoPicHolder;
@@ -20,9 +23,10 @@ import java.util.List;
  */
 
 public class InfoAdapter extends ProgressAdapter{
-    public static final int GANK_TYPE_INFO =1;
-    public static final int GANK_INFO_PIC = 2;
-    public static final int GANK_INFO_PIC_INDICATE = 3;
+    private static final int GANK_TYPE_INFO =1;
+    private static final int GANK_INFO_PIC = 2;
+    private static final int GANK_INFO_PIC_INDICATE = 3;
+    private boolean loadImg = true;
     private Activity mActivity;
 
     public InfoAdapter(List<GankInfo> mContentList,Activity activity) {
@@ -32,13 +36,21 @@ public class InfoAdapter extends ProgressAdapter{
 
     @Override
     public int getItemViewTypeExt(int position) {
-        if (getmContent().get(position).getImages()==null) {
-            return GANK_TYPE_INFO;
-        }else if (getmContent().get(position).getImages().size()==1){
-            return GANK_INFO_PIC;
+        if (loadImg) {
+            if (getmContent().get(position).getImages() == null) {
+                return GANK_TYPE_INFO;
+            } else if (getmContent().get(position).getImages().size() == 1) {
+                return GANK_INFO_PIC;
+            } else {
+                return GANK_INFO_PIC_INDICATE;
+            }
         }else {
-            return GANK_INFO_PIC_INDICATE;
+            return GANK_TYPE_INFO;
         }
+    }
+
+    public void loadImg(boolean flag){
+        loadImg = flag;
     }
 
     @Override
@@ -62,9 +74,15 @@ public class InfoAdapter extends ProgressAdapter{
     public void onBindExtViewHolder(RecyclerView.ViewHolder holder, GankInfo info) {
         ((InfoHolder) holder).bindModel(info);
         ((InfoHolder) holder).bottomBackground.setOnClickListener(v -> {
-            CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-            CustomTabsIntent intent = builder.build();
-            intent.launchUrl(mActivity, Uri.parse(info.getUrl()));
+            if (!Util.getPreferredLoadWebView(mActivity)) {
+                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                CustomTabsIntent intent = builder.build();
+                intent.launchUrl(mActivity, Uri.parse(info.getUrl()));
+            }else {
+                Intent i = new Intent(mActivity, WebViewActivity.class);
+                i.putExtra(WebViewActivity.EXTRA_INTENT_URL,info.getUrl());
+                mActivity.startActivity(i);
+            }
         });
     }
 

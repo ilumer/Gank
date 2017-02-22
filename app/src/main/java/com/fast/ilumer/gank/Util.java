@@ -1,7 +1,10 @@
 package com.fast.ilumer.gank;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
 import java.text.ParseException;
@@ -90,5 +93,15 @@ public class Util {
         int height = Math.round(width/aspectRatio);
         String returnUri = url + "?imageView2/1/w/" + width + "/h/" + height;
         return Uri.parse(returnUri);
+    }
+
+    public static boolean getPreferredLoadInfo(Context context){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getBoolean(context.getString(R.string.no_img_info_key),false);
+    }
+
+    public static boolean getPreferredLoadWebView(Context context){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getBoolean(context.getString(R.string.load_with_webview_key),false);
     }
 }

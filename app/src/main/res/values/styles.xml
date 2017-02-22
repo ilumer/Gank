@@ -13,6 +13,10 @@
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
     </style>
+    <!--must impl theme-->
+    <style name="SettingActivity.Gank.Theme" parent="Gank.Theme.NoActionBar">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+    </style>
 
     <style name="Custom.Tablaout.Theme" parent="TextAppearance.Design.Tab">
         <item name="textAllCaps">false</item>

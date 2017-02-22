@@ -1,9 +1,11 @@
 package com.fast.ilumer.gank.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.fast.ilumer.gank.Util;
 import com.fast.ilumer.gank.model.GankInfo;
 import com.fast.ilumer.gank.model.InfoAdapter;
 import com.fast.ilumer.gank.model.ProgressAdapter;
@@ -28,7 +30,30 @@ public class GankTypeFragment extends RecyclerViewFragment{
 
     @Override
     protected ProgressAdapter getAdapter(List<GankInfo> mContentList) {
-        return new InfoAdapter(mContentList,getActivity());
+        InfoAdapter adapter = new InfoAdapter(mContentList,getActivity());
+        if (Util.getPreferredLoadInfo(getActivity())) {
+            adapter.loadImg(false);
+        }
+        return adapter;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (Util.getPreferredLoadInfo(getActivity())){
+            InfoAdapter adapter = (InfoAdapter) getAdapter();
+            adapter.loadImg(false);
+            adapter.notifyDataSetChanged();
+        }else {
+            InfoAdapter adapter = (InfoAdapter) getAdapter();
+            adapter.loadImg(true);
+            adapter.notifyDataSetChanged();
+        }
     }
 
     protected RecyclerView.LayoutManager getLayoutManager() {

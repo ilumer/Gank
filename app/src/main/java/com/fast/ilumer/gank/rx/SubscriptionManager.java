@@ -9,7 +9,7 @@ import rx.Subscription;
  * Created by ilumer on 17-2-20.
  */
 
-public class SubscriptionManager {
+public final class SubscriptionManager {
     volatile static SubscriptionManager instance;
     //用唯一的gank uri
     private Map<String, Subscription> map = new ConcurrentHashMap<>();

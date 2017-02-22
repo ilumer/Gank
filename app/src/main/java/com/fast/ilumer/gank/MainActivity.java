@@ -6,6 +6,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,7 @@ import android.view.MenuItem;
 
 import com.fast.ilumer.gank.activity.GankTodayActivity;
 import com.fast.ilumer.gank.activity.SearchActivity;
+import com.fast.ilumer.gank.activity.SettingActivity;
 import com.fast.ilumer.gank.dao.DbOpenHelper;
 import com.fast.ilumer.gank.fragment.GankMeiZiFragment;
 import com.fast.ilumer.gank.fragment.GankTypeFragment;
@@ -87,11 +89,18 @@ public class MainActivity extends AppCompatActivity
             }
 
             case R.id.setting:{
+                Intent i = new Intent(this, SettingActivity.class);
+                startActivity(i);
                 return true;
             }
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @Override

@@ -3,6 +3,7 @@
     package="com.fast.ilumer.gank">
 
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -12,28 +13,39 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".activity.PictureActivity" />
         <activity android:name=".activity.GankTodayActivity" />
-        <activity android:name=".activity.SearchActivity"
-            android:theme="@style/SearchActivity.Gank.Theme"
-            android:launchMode="singleTop">
+        <activity
+            android:name=".activity.SearchActivity"
+            android:launchMode="singleTop"
+            android:theme="@style/SearchActivity.Gank.Theme">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-            <meta-data android:name="android.app.searchable"
+
+            <meta-data
+                android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
         <activity android:name=".activity.SearchResultActivity" />
+
         <provider
-            android:authorities="@string/content_authority"
             android:name=".dao.GankProvider"
-            android:exported="false"/>
+            android:authorities="@string/content_authority"
+            android:exported="false" />
 
-
-
+        <activity android:name=".activity.SettingActivity"
+                  android:theme="@style/SettingActivity.Gank.Theme" >
+            <intent-filter>
+                <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".activity.WebViewActivity"/>
     </application>
 
 </manifest>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/basic_setting">
+        <Preference
+            android:key="@string/delete"
+            android:summary="@string/delete_summary"
+            android:title="@string/image_cache" />
+
+        <Preference
+            android:key="@string/data_usage_key"
+            android:summary="@string/data_usage_summary"
+            android:title="@string/data_usage_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/load_with_webview_key"
+            android:summary="@string/load_with_webview_summary"
+            android:title="@string/load_with_webview_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/no_img_info_key"
+            android:summary="@string/no_img_info"
+            android:title="@string/info_loader" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/about">
+        <Preference
+            android:summary="@string/read_code"
+            android:title="@string/open_source">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/github_address" />
+        </Preference>
+    </PreferenceCategory>
+</PreferenceScreen>
