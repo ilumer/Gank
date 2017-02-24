@@ -51,7 +51,7 @@ public class GirlAdapter extends ProgressAdapter{
         ((GirlHolder)holder).bindModel(info);
         ((GirlHolder)holder).imageView.setOnClickListener(v->{
             Intent i = new Intent(host, PictureActivity.class);
-            i.putExtra("uri",info.getUrl());
+            i.putExtra(PictureActivity.INTENT_EXTRA_URL,info.getUrl());
             host.startActivity(i);
         });
     }

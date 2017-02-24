@@ -1,4 +1,4 @@
-package com.fast.ilumer.gank;
+package com.fast.ilumer.gank.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,18 +6,14 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.fast.ilumer.gank.activity.GankTodayActivity;
-import com.fast.ilumer.gank.activity.SearchActivity;
-import com.fast.ilumer.gank.activity.SettingActivity;
+import com.fast.ilumer.gank.R;
 import com.fast.ilumer.gank.dao.DbOpenHelper;
 import com.fast.ilumer.gank.fragment.GankMeiZiFragment;
 import com.fast.ilumer.gank.fragment.GankTypeFragment;

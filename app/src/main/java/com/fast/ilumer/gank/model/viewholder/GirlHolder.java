@@ -15,7 +15,7 @@ import butterknife.ButterKnife;
  */
 
 public class GirlHolder extends BaseHolder{
-    @BindView(R.id.gril)
+    @BindView(R.id.image)
     public SimpleDraweeView imageView;
     private float aspectRatio;
     public GirlHolder(View itemView) {

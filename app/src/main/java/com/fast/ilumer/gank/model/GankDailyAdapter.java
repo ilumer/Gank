@@ -73,6 +73,7 @@ public class GankDailyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 ((GirlHolder)holder).bindModel(info);
                 ((GirlHolder)holder).imageView.setOnClickListener(v -> {
                     Intent i = new Intent(host,PictureActivity.class);
+                    i.putExtra(PictureActivity.INTENT_EXTRA_URL,info.getUrl());
                     host.startActivity(i);
                 });
                 break;

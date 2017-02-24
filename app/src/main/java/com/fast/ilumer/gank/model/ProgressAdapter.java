@@ -80,7 +80,7 @@ public abstract class ProgressAdapter extends
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType== GANK_VIEW_LOADING){
-            return new ProgressViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.gank_progressbar,parent,false));
+            return new ProgressViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.progressbar,parent,false));
         }else {
             return onCreateExtViewHolder(parent, viewType);
         }
