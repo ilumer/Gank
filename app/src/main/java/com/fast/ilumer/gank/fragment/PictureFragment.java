@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.fast.ilumer.gank.R;
 import com.fast.ilumer.gank.service.DownloadImgService;
+import com.fast.ilumer.gank.service.MuzeiSource;
 
 import butterknife.BindView;
 

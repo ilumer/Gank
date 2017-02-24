@@ -206,6 +206,7 @@ public abstract class RecyclerViewFragment extends BaseFragment
         subscription.add(getReslut(1)
                 .filter(list -> !mContentList.containsAll(list))
                 .map(list -> {
+                    updateMuzei();
                     BriteDatabase.Transaction transaction = db.newTransaction();
                     try {
                         db.execute("delete From " + Db.TYPE_TABLE_NAME + " where " + GankInfoContract.GankEntry._ID + " > -1 and " + GankInfoContract.GankEntry.TYPE + " = ?", type);
@@ -249,6 +250,13 @@ public abstract class RecyclerViewFragment extends BaseFragment
     protected abstract ProgressAdapter getAdapter(List<GankInfo> mContentList);
 
     protected abstract RecyclerView.LayoutManager getLayoutManager();
+
+    /*
+    * 实现的比较差 没有办法做到好的解耦
+    * */
+    protected void updateMuzei(){
+
+    }
 
     protected void addDivider(RecyclerView recyclerView){
 

@@ -1,12 +1,15 @@
 package com.fast.ilumer.gank.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.fast.ilumer.gank.activity.MainActivity;
 import com.fast.ilumer.gank.model.GankInfo;
 import com.fast.ilumer.gank.model.GirlAdapter;
 import com.fast.ilumer.gank.model.ProgressAdapter;
+import com.fast.ilumer.gank.service.MuzeiSource;
 
 import java.util.List;
 
@@ -51,5 +54,11 @@ public class GankMeiZiFragment extends RecyclerViewFragment{
             }
         });
         return layoutManager;
+    }
+
+    @Override
+    protected void updateMuzei() {
+        Intent i = new Intent(getActivity(), MuzeiSource.class);
+        getActivity().startService(i);
     }
 }
