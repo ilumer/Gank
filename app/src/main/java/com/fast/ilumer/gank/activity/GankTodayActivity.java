@@ -153,7 +153,7 @@ public class GankTodayActivity extends AppCompatActivity
             new Func1<GankDay, Observable<Result<GankRepositories<GankDaily>>>>() {
         @Override
         public Observable<Result<GankRepositories<GankDaily>>> call(GankDay day) {
-            return RetrofitHelper.getInstance().getGank().gankDailyInfo(
+            return RetrofitHelper.getRetrofitInstance().getGank().gankDailyInfo(
                     day.getYear(),day.getMonthForGank(),day.getDay())
                     .subscribeOn(Schedulers.io());
         }

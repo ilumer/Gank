@@ -21,7 +21,7 @@ public class SettingActivity extends BaseActivity{
     }
 
     @Override
-    protected int providerLayoutId() {
+    protected int provideLayoutId() {
         return R.layout.toolbar_base_layout;
     }
 }

@@ -39,7 +39,7 @@ public class App extends Application {
                 .setIndexPopulateAtStartupEnabled(true)
                 .build();
         ImagePipelineConfig config = OkHttpImagePipelineConfigFactory
-                .newBuilder(this, RetrofitHelper.initClient())
+                .newBuilder(this, RetrofitHelper.getClientInstance())
                 .setBitmapsConfig(Bitmap.Config.RGB_565)
                 .setMainDiskCacheConfig(diskCacheConfig)
                 .setRequestListeners(requestListeners)

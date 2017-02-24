@@ -38,14 +38,20 @@
             android:authorities="@string/content_authority"
             android:exported="false" />
 
-        <activity android:name=".activity.SettingActivity"
-                  android:theme="@style/SettingActivity.Gank.Theme" >
+        <activity
+            android:name=".activity.SettingActivity"
+            android:theme="@style/SettingActivity.Gank.Theme">
             <intent-filter>
                 <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.WebViewActivity"/>
+        <activity android:name=".activity.WebViewActivity" />
+
+        <service
+            android:name=".service.DownloadImgService"
+            android:exported="false"/>
     </application>
 
 </manifest>

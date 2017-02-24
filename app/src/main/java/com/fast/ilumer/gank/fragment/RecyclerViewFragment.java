@@ -192,7 +192,7 @@ public abstract class RecyclerViewFragment extends BaseFragment
     }
 
     private Observable<List<GankInfo>> getReslut(int page) {
-        return RetrofitHelper.getInstance().getGank()
+        return RetrofitHelper.getRetrofitInstance().getGank()
                 .gankTypeInfo(type, 10, page)
                 .map(gankRepositoriesResult -> gankRepositoriesResult.response().body().results)
                 .subscribeOn(Schedulers.io());

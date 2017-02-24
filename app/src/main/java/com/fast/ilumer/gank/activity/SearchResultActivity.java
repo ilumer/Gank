@@ -33,7 +33,7 @@ public class SearchResultActivity extends BaseActivity implements RecyclerViewFr
     }
 
     @Override
-    protected int providerLayoutId() {
+    protected int provideLayoutId() {
         return R.layout.toolbar_base_layout;
     }
 

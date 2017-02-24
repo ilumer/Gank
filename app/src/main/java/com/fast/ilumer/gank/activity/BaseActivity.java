@@ -16,7 +16,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(providerLayoutId());
+        setContentView(provideLayoutId());
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentById(R.id.fragment_container);
         if (fragment==null) {
@@ -29,7 +29,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public abstract Fragment createNewFragment();
 
-    protected int providerLayoutId(){
+    protected int provideLayoutId(){
         return R.layout.base_activity_layout;
     }
 }
