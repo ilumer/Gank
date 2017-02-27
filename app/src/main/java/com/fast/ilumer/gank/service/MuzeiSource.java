@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 
-import com.fast.ilumer.gank.activity.MainActivity;
-import com.fast.ilumer.gank.activity.PictureActivity;
 import com.fast.ilumer.gank.dao.Db;
 import com.fast.ilumer.gank.dao.GankInfoContract;
 import com.google.android.apps.muzei.api.Artwork;
@@ -38,7 +36,7 @@ public class MuzeiSource extends MuzeiArtSource{
         //从cursor中找出最新更新的资料
         String url = null;
         Cursor cursor = getContentResolver().query(
-                GankInfoContract.GankEntry.CONTENT_URI,
+                GankInfoContract.GankEntry.TYPE_CONTENT_URI,
                 new String[]{GankInfoContract.GankEntry.URL},
                 GankInfoContract.GankEntry.TYPE+" = ?",
                 new String[]{"福利"},

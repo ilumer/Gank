@@ -33,18 +33,28 @@ public class GankInfoContract {
         //sqlite中只有四种数据类型
         public static final String IMAGELIST = "images";
 
-        public static Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+        public static Uri TYPE_CONTENT_URI = BASE_CONTENT_URI.buildUpon()
                 .appendPath(Db.TYPE_TABLE_NAME)
                 .build();
 
-        public static String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/"+Db.TYPE_TABLE_NAME;
+        public static Uri DAILY_CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+                .appendPath(Db.TODAY_TABLE_NAME)
+                .build();
+
+        public static String TYPE_CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + Db.TYPE_TABLE_NAME;
+        public static String DAILY_CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + Db.TODAY_TABLE_NAME;
 
         public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/"+Db.TYPE_TABLE_NAME;
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + Db.TYPE_TABLE_NAME;
 
         public static Uri buildGankTypeUri(long id){
-            return ContentUris.withAppendedId(CONTENT_URI,id);
+            return ContentUris.withAppendedId(TYPE_CONTENT_URI,id);
+        }
+
+        public static Uri buildGankDailyUri(long id){
+            return ContentUris.withAppendedId(DAILY_CONTENT_URI,id);
         }
 
     }

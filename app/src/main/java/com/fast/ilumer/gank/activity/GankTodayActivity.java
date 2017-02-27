@@ -25,8 +25,6 @@ import com.fast.ilumer.gank.model.GankRepositories;
 import com.fast.ilumer.gank.network.RetrofitHelper;
 import com.fast.ilumer.gank.rx.Funcs;
 import com.fast.ilumer.gank.rx.Results;
-import com.squareup.sqlbrite.BriteDatabase;
-import com.squareup.sqlbrite.SqlBrite;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,8 +49,6 @@ public class GankTodayActivity extends AppCompatActivity
     private GankDailyAdapter adapter;
     private LinearLayoutManager linearlayoutManager;
     private List<GankInfo> contentList = new ArrayList<>();
-    private SqlBrite sqlBrite = new SqlBrite.Builder().build();
-    private BriteDatabase db ;
     private GankDaily temp;
     private GankDay day;
     private PublishSubject<GankDay> subject;
@@ -71,7 +67,6 @@ public class GankTodayActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_today_gank);
         unbinder = ButterKnife.bind(this);
-        db = sqlBrite.wrapDatabaseHelper(new DbOpenHelper(this),Schedulers.io());
         setSupportActionBar(toolbar);
         subject = PublishSubject.create();
         initDayPath();
@@ -81,11 +76,20 @@ public class GankTodayActivity extends AppCompatActivity
         linearlayoutManager = new LinearLayoutManager(this);
         content.setLayoutManager(linearlayoutManager);
         content.setAdapter(adapter);
-        subscription.add(db.createQuery(Db.TODAY_TABLE_NAME,"select * from "+Db.TODAY_TABLE_NAME)
-                .mapToOne(GankDaily.parse)
+        subscription.add(Observable.fromCallable(() ->
+                getContentResolver().query(
+                        GankInfoContract.GankEntry.DAILY_CONTENT_URI,
+                        null,
+                        null,
+                        null,
+                        null
+                )
+        ).map(GankDaily.parse)
                 .filter(Funcs.not(Results.isNull()))
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(GankTodaySuccess));
+
         Observable<Result<GankRepositories<GankDaily>>> result = subject
                 .concatMap(getGank)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -107,7 +111,9 @@ public class GankTodayActivity extends AppCompatActivity
         subscription.add(postData
                 .filter(daily -> !daily.equals(temp))
                 .observeOn(Schedulers.io())
-                .subscribe(dataInsert));
+                .doOnNext(dataInsert)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(GankTodaySuccess));
         //由于gank的每日的更新的item不确定所以对应的id更新的数据库的想法有一点的不合实际
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,17 +141,13 @@ public class GankTodayActivity extends AppCompatActivity
         @Override
         public void call(GankDaily gankDaily) {
             Log.e("gankDaily","not null");
-            BriteDatabase.Transaction transaction = db.newTransaction();
-            try{
-                db.execute("delete From "+Db.TODAY_TABLE_NAME+" where "+ GankInfoContract.GankEntry._ID+" > -1");
-                List<GankInfo> infoList = GanKDailyToList(gankDaily);
-                for (GankInfo info:infoList){
-                    db.insert(Db.TODAY_TABLE_NAME,new GankInfo.Builder(info).build());
-                }
-                transaction.markSuccessful();
-            }finally {
-                transaction.end();
+            getContentResolver().delete(GankInfoContract.GankEntry.DAILY_CONTENT_URI,
+                    GankInfoContract.GankEntry._ID+" > ?",new String[]{"-1"});
+            for (GankInfo info:GanKDailyToList(gankDaily)){
+                getContentResolver().insert(GankInfoContract.GankEntry.DAILY_CONTENT_URI,
+                        new GankInfo.Builder(info).build());
             }
+            //TODO:等待添加事务
         }
     };
 
@@ -163,6 +165,7 @@ public class GankTodayActivity extends AppCompatActivity
     private final Action1<GankDaily> GankTodaySuccess = new Action1<GankDaily>() {
         @Override
         public void call(GankDaily gankDaily) {
+            Log.e("TAG","TAG");
             temp = gankDaily;
             List<GankInfo> list = GanKDailyToList(gankDaily);
             contentList.clear();

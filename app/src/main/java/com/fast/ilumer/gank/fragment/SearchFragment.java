@@ -24,7 +24,6 @@ import com.fast.ilumer.gank.model.listener.OnClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import butterknife.BindView;
 import rx.Observable;
@@ -82,18 +81,15 @@ public class SearchFragment extends BaseFragment implements OnClickListener{
     }
 
     private void searchFor(){
-        subscription.add(Observable.fromCallable(new Callable<Cursor>() {
-            @Override
-            public Cursor call() throws Exception {
-                return getActivity().getContentResolver().query(
-                        GankInfoContract.GankEntry.CONTENT_URI,
+        subscription.add(Observable.fromCallable(() ->
+                getActivity().getContentResolver().query(
+                        GankInfoContract.GankEntry.TYPE_CONTENT_URI,
                         new String[]{"Distinct("+GankInfoContract.GankEntry.TYPE+")"},
                         GankInfoContract.GankEntry.TYPE+" != ?",
                         new String[]{"福利"},
                         null
-                );
-            }
-        }).map(cursor -> {
+                )
+        ).map(cursor -> {
             cursor.moveToFirst();
             List<SearchRepo> mlist = new ArrayList<>();
             try {
@@ -119,7 +115,7 @@ public class SearchFragment extends BaseFragment implements OnClickListener{
             public Cursor call() {
                 return getActivity()
                         .getContentResolver()
-                        .query(GankInfoContract.GankEntry.CONTENT_URI,
+                        .query(GankInfoContract.GankEntry.TYPE_CONTENT_URI,
                                 new String[]{GankInfoContract.GankEntry.DESC, GankInfoContract.GankEntry.URL},
                                 "type != ? and description like ? ",
                                 new String[]{"福利", "%" + query + "%"},

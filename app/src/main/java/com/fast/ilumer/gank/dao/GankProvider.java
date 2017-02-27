@@ -15,6 +15,7 @@ public class GankProvider extends ContentProvider {
 
     private static final UriMatcher mUriMatcher = buildUriMatcher() ;
     static final int GANKTYPE = 100;
+    static final int GANKDAILY = 101;
     private DbOpenHelper mDbOpenHelper;
 
     @Override
@@ -41,10 +42,26 @@ public class GankProvider extends ContentProvider {
                 );
                 break;
             }
+
+            case GANKDAILY:{
+                retCursor = mDbOpenHelper.getReadableDatabase().query(
+                        Db.TODAY_TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+
             default:
                 throw new UnsupportedOperationException("unexpected uri :"+uri);
         }
         retCursor.setNotificationUri(getContext().getContentResolver(),uri);
+        retCursor.moveToPosition(-1);
+        //http://stackoverflow.com/questions/10723770/whats-the-best-way-to-iterate-an-android-cursor
         return retCursor;
     }
 
@@ -54,7 +71,9 @@ public class GankProvider extends ContentProvider {
         int match  = mUriMatcher.match(uri);
         switch (match){
             case GANKTYPE:
-                return GankInfoContract.GankEntry.CONTENT_TYPE;
+                return GankInfoContract.GankEntry.TYPE_CONTENT_TYPE;
+            case GANKDAILY:
+                return GankInfoContract.GankEntry.DAILY_CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("unexpected uri :"+uri);
         }
@@ -75,9 +94,21 @@ public class GankProvider extends ContentProvider {
                 }
                 break;
             }
+
+            case GANKDAILY: {
+                long id = mDbOpenHelper.getWritableDatabase().insert(Db.TODAY_TABLE_NAME,null, values);
+                if (id > 0) {
+                    returnUri = GankInfoContract.GankEntry.buildGankDailyUri(id);
+                }else {
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+                break;
+            }
+
             default:
                 throw new UnsupportedOperationException("unexpected uri :"+uri);
         }
+
         getContext().getContentResolver().notifyChange(uri,null);
         return returnUri;
     }
@@ -90,6 +121,12 @@ public class GankProvider extends ContentProvider {
             case GANKTYPE:{
                 rowsDeleted = mDbOpenHelper.getWritableDatabase()
                         .delete(Db.TYPE_TABLE_NAME,selection,selectionArgs);
+                break;
+            }
+
+            case GANKDAILY:{
+                rowsDeleted = mDbOpenHelper.getWritableDatabase()
+                        .delete(Db.TODAY_TABLE_NAME,selection,selectionArgs);
                 break;
             }
             default:{
@@ -110,6 +147,13 @@ public class GankProvider extends ContentProvider {
                         .update(Db.TYPE_TABLE_NAME,values,selection,selectionArgs);
                 break;
             }
+
+            case GANKDAILY:{
+                rowUpdated = mDbOpenHelper.getWritableDatabase()
+                        .update(Db.TYPE_TABLE_NAME,values,selection,selectionArgs);
+                break;
+            }
+
             default: {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
             }
@@ -122,6 +166,7 @@ public class GankProvider extends ContentProvider {
         UriMatcher matcher =  new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = GankInfoContract.CONTENT_AUTHORITY;
         matcher.addURI(authority,Db.TYPE_TABLE_NAME, GANKTYPE);
+        matcher.addURI(authority,Db.TODAY_TABLE_NAME,GANKDAILY);
         return matcher;
     }
 }

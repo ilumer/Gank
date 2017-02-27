@@ -5,13 +5,11 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
-import com.fast.ilumer.gank.App;
 import com.fast.ilumer.gank.R;
 import com.fast.ilumer.gank.Util;
 import com.fast.ilumer.gank.dao.Db;
@@ -21,7 +19,6 @@ import com.fast.ilumer.gank.model.ProgressAdapter;
 import com.fast.ilumer.gank.network.RetrofitHelper;
 import com.fast.ilumer.gank.recyclerview.EndlessRecyclerOnScrollListener;
 import com.fast.ilumer.gank.rx.SubscriptionManager;
-import com.squareup.sqlbrite.BriteDatabase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,8 +52,6 @@ public abstract class RecyclerViewFragment extends BaseFragment
     ProgressAdapter mAdapter;
 
     String type;
-    BriteDatabase db;
-    DbInstance dbInstance;
     Parcelable layoutManagerState;
     EndlessRecyclerOnScrollListener scrollListener;
 
@@ -74,20 +69,8 @@ public abstract class RecyclerViewFragment extends BaseFragment
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        Log.e("onAttach", EXTRA_TYPE);
-        try {
-            dbInstance = ((DbInstance) context);
-        }catch (ClassCastException ex) {
-            throw new ClassCastException(context.toString() + " must implement DbInstance");
-        }
-    }
-
-    @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         Log.e(type,"onViewCreated");
-        db = dbInstance.instance();
         mAdapter = getAdapter(mContentList);
         mAdapter.setHasStableIds(true);
         mContent.setAdapter(mAdapter);
@@ -105,9 +88,16 @@ public abstract class RecyclerViewFragment extends BaseFragment
         mContent.addOnScrollListener(scrollListener);
         if (savedInstanceState!=null){
             mContent.getLayoutManager().onRestoreInstanceState(layoutManagerState);
-        }else {
-            subscription.add(db.createQuery(Db.TYPE_TABLE_NAME, "select * from " + Db.TYPE_TABLE_NAME + " where " + GankInfoContract.GankEntry.TYPE + " = ?", type)
-                    .mapToOne(mapToList)
+        } else {
+            subscription.add(Observable.fromCallable(() ->
+                    getActivity().getContentResolver().query(
+                            GankInfoContract.GankEntry.TYPE_CONTENT_URI,
+                            null,
+                            GankInfoContract.GankEntry.TYPE + " = ?",
+                            new String[]{type},
+                            null
+                    )
+            ).map(mapToList)
                     .filter(list -> list.size() != 0)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -123,11 +113,6 @@ public abstract class RecyclerViewFragment extends BaseFragment
                     }));
             onRefresh();
         }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
     }
 
     public void loadMore(int page){
@@ -157,7 +142,7 @@ public abstract class RecyclerViewFragment extends BaseFragment
             List<GankInfo> temp = new ArrayList<>();
             cursor.moveToFirst();
             try {
-                do {
+                while (cursor.moveToNext()){
                     GankInfo info = new GankInfo();
                     info.setDatebaseId(Db.getInt(cursor, GankInfoContract.GankEntry._ID));
                     info.set_id(Db.getString(cursor, GankInfoContract.GankEntry.URL_ID));
@@ -171,7 +156,7 @@ public abstract class RecyclerViewFragment extends BaseFragment
                     String images = Db.getString(cursor,GankInfoContract.GankEntry.IMAGELIST);
                     info.setImages(images==null?null: Arrays.asList(Util.convertStringToArray(images)));
                     temp.add(info);
-                } while (cursor.moveToNext());
+                }
             } finally {
                 cursor.close();
             }
@@ -179,11 +164,6 @@ public abstract class RecyclerViewFragment extends BaseFragment
         }
     };
 
-    @Override
-    public void onDetach() {
-        dbInstance = null;
-        super.onDetach();
-    }
 
     @Override
     public void onStop() {
@@ -207,18 +187,13 @@ public abstract class RecyclerViewFragment extends BaseFragment
                 .filter(list -> !mContentList.containsAll(list))
                 .map(list -> {
                     updateMuzei();
-                    BriteDatabase.Transaction transaction = db.newTransaction();
-                    try {
-                        db.execute("delete From " + Db.TYPE_TABLE_NAME + " where " + GankInfoContract.GankEntry._ID + " > -1 and " + GankInfoContract.GankEntry.TYPE + " = ?", type);
-                        //这里直接使用字符串拼接竟然会直接出现问题
-                        //http://stackoverflow.com/questions/21958789/sqlite-insert-issue-error-no-such-column
-                        //http://stackoverflow.com/questions/6337296/sqlite-exception-no-such-column-when-trying-to-select}
-                        for (GankInfo info:list) {
-                            db.insert(Db.TYPE_TABLE_NAME, new GankInfo.Builder(info).build());
-                        }
-                        transaction.markSuccessful();
-                    } finally {
-                        transaction.end();
+                    getActivity()
+                            .getContentResolver()
+                            .delete(GankInfoContract.GankEntry.TYPE_CONTENT_URI,"_id > ? and type = ?",new String[]{"-1",type});
+                    for (GankInfo info:list){
+                        getActivity()
+                                .getContentResolver()
+                                .insert(GankInfoContract.GankEntry.TYPE_CONTENT_URI,new GankInfo.Builder(info).build());
                     }
                     return list;
                 })
@@ -237,7 +212,14 @@ public abstract class RecyclerViewFragment extends BaseFragment
 
                     @Override
                     public void onNext(List<GankInfo> list) {
-
+                        if (mContentList.size() >= 10) {
+                            for (int i = 0; i < list.size(); i++) {
+                                mContentList.set(i, list.get(i));
+                            }
+                        } else {
+                            mContentList.addAll(list);
+                        }
+                        mAdapter.notifyDataSetChanged();
                     }
                 }));
     }
@@ -260,10 +242,6 @@ public abstract class RecyclerViewFragment extends BaseFragment
 
     protected void addDivider(RecyclerView recyclerView){
 
-    }
-
-    public interface DbInstance {
-        BriteDatabase instance();
     }
 
 }
