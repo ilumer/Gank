@@ -40,4 +40,5 @@
     <string name="download">下载</string>
     <string name="download_success">下载成功</string>
     <string name="download_fail">下载失败</string>
+    <string name="fail_download_permission">抱歉没有权限下载，可以前往权限设置处添加权限</string>
 </resources>

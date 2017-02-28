@@ -140,7 +140,6 @@ public abstract class RecyclerViewFragment extends BaseFragment
         @Override
         public List<GankInfo> call(Cursor cursor) {
             List<GankInfo> temp = new ArrayList<>();
-            cursor.moveToFirst();
             try {
                 while (cursor.moveToNext()){
                     GankInfo info = new GankInfo();

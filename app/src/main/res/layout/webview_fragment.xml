@@ -6,6 +6,13 @@
 
     <include layout="@layout/include_toolbar"/>
 
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        style="@android:style/Widget.ProgressBar.Horizontal"/>
+    <!--如何修改颜色http://stackoverflow.com/questions/2020882/how-to-change-progress-bars-progress-color-in-android-->
+
     <WebView
         android:id="@+id/webview"
         android:layout_width="match_parent"
