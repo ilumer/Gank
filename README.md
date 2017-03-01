@@ -1,2 +1,2 @@
 # Gank
-a simple Android Client for gank.io
+a simple Android Client for gank.io, 
