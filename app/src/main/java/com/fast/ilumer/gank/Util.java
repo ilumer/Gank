@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
@@ -103,5 +104,15 @@ public class Util {
     public static boolean getPreferredLoadWebView(Context context){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         return preferences.getBoolean(context.getString(R.string.load_with_webview_key),false);
+    }
+
+    /**
+     *
+     * @param context 获取需要的资源
+     * @return {@link CustomTabsIntent.Builder}
+     */
+    public static CustomTabsIntent.Builder getCustomIntent(Context context){
+        return new CustomTabsIntent.Builder()
+                .setToolbarColor(context.getResources().getColor(R.color.colorPrimary));
     }
 }

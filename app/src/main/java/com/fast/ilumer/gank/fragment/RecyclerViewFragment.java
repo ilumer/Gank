@@ -96,8 +96,7 @@ public abstract class RecyclerViewFragment extends BaseFragment
                             GankInfoContract.GankEntry.TYPE + " = ?",
                             new String[]{type},
                             null
-                    )
-            ).map(mapToList)
+                    )).map(mapToList)
                     .filter(list -> list.size() != 0)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -184,8 +183,7 @@ public abstract class RecyclerViewFragment extends BaseFragment
         mSwipeRefreshLayout.setRefreshing(true);
         subscription.add(getReslut(1)
                 .filter(list -> !mContentList.containsAll(list))
-                .map(list -> {
-                    updateMuzei();
+                .doOnNext(list -> {
                     getActivity()
                             .getContentResolver()
                             .delete(GankInfoContract.GankEntry.TYPE_CONTENT_URI,"_id > ? and type = ?",new String[]{"-1",type});
@@ -194,7 +192,9 @@ public abstract class RecyclerViewFragment extends BaseFragment
                                 .getContentResolver()
                                 .insert(GankInfoContract.GankEntry.TYPE_CONTENT_URI,new GankInfo.Builder(info).build());
                     }
-                    return list;
+                    Log.e("TAG",Thread.currentThread().getName());
+                    updateMuzei();
+                    //等待数据库更新成功后再去获取最新的壁纸
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -211,6 +211,7 @@ public abstract class RecyclerViewFragment extends BaseFragment
 
                     @Override
                     public void onNext(List<GankInfo> list) {
+                        Log.e("TAG",Thread.currentThread().getName());
                         if (mContentList.size() >= 10) {
                             for (int i = 0; i < list.size(); i++) {
                                 mContentList.set(i, list.get(i));

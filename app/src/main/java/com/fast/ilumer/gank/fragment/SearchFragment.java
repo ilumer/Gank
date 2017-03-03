@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import android.view.View;
 
 import com.fast.ilumer.gank.R;
+import com.fast.ilumer.gank.Util;
 import com.fast.ilumer.gank.activity.SearchResultActivity;
 import com.fast.ilumer.gank.dao.Db;
 import com.fast.ilumer.gank.dao.GankInfoContract;
@@ -151,9 +152,9 @@ public class SearchFragment extends BaseFragment implements OnClickListener{
             i.putExtra(SearchResultActivity.EXTRA_STRING,repo.getShowItem());
             getActivity().startActivity(i);
         }else if (repo.getTag()==SearchTag.item){
-            CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-            CustomTabsIntent intent = builder.build();
-            intent.launchUrl(getActivity(), Uri.parse(repo.getUri()));
+            Util.getCustomIntent(getActivity())
+                    .build()
+                    .launchUrl(getActivity(), Uri.parse(repo.getUri()));
         }
     }
 

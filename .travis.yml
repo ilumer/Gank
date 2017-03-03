@@ -10,6 +10,8 @@ android:            # 配置信息
     - tools
     - build-tools-25.0.2
     - android-25
+    - extra-google-google_play_services
+    - extra-google-m2repository
     - extra-android-m2repository     # Android Support Repository
     - extra-android-support          # Support Library
 

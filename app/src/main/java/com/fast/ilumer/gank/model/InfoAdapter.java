@@ -75,9 +75,9 @@ public class InfoAdapter extends ProgressAdapter{
         ((InfoHolder) holder).bindModel(info);
         ((InfoHolder) holder).bottomBackground.setOnClickListener(v -> {
             if (!Util.getPreferredLoadWebView(mActivity)) {
-                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-                CustomTabsIntent intent = builder.build();
-                intent.launchUrl(mActivity, Uri.parse(info.getUrl()));
+                Util.getCustomIntent(mActivity)
+                        .build()
+                        .launchUrl(mActivity, Uri.parse(info.getUrl()));
             }else {
                 Intent i = new Intent(mActivity, WebViewActivity.class);
                 i.putExtra(WebViewActivity.EXTRA_INTENT_URL,info.getUrl());

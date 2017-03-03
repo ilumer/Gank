@@ -15,7 +15,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.fast.ilumer.gank.R;
+import com.fast.ilumer.gank.Util;
 import com.fast.ilumer.gank.activity.PictureActivity;
+import com.fast.ilumer.gank.activity.WebViewActivity;
 import com.fast.ilumer.gank.model.viewholder.GirlHolder;
 
 import java.util.List;
@@ -139,8 +141,15 @@ public class GankDailyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             //实现两个style的textview
             content.setText(builder);
             content.setOnClickListener(v -> {
-                CustomTabsIntent intent = new CustomTabsIntent.Builder().build();
-                intent.launchUrl(host, Uri.parse(info.getUrl()));
+                if (!Util.getPreferredLoadWebView(host)) {
+                    Util.getCustomIntent(host)
+                            .build()
+                            .launchUrl(host, Uri.parse(info.getUrl()));
+                }else {
+                    Intent i = new Intent(host, WebViewActivity.class);
+                    i.putExtra(WebViewActivity.EXTRA_INTENT_URL,info.getUrl());
+                    host.startActivity(i);
+                }
             });
         }
     }
