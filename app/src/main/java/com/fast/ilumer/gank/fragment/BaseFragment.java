@@ -23,6 +23,7 @@ public abstract class BaseFragment extends Fragment {
     protected CompositeSubscription subscription;
     View mRootView;
     protected abstract int getLayoutId();
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if (null==mRootView){

@@ -1,33 +1,27 @@
-language: android   # 声明构建语言环境
-
+language: android
 notifications:
   email: false
-
-sudo: false         # 开启基于容器的Travis CI任务，让编译效率更高。
-
-android:            # 配置信息
+sudo: false
+android:
   components:
-    - tools
-    - build-tools-25.0.2
-    - android-25
-    - extra-google-google_play_services
-    - extra-google-m2repository
-    - extra-android-m2repository     # Android Support Repository
-    - extra-android-support          # Support Library
-
+  - tools
+  - build-tools-25.0.2
+  - android-25
+  - extra-google-google_play_services
+  - extra-google-m2repository
+  - extra-android-m2repository
+  - extra-android-support
 jdk:
 - oraclejdk8
-
-script:              # 执行:下面的命令
-  - ./gradlew assembleRelease
-
-before_deploy:       # 部署之前
-  # 使用 mv 命令进行修改apk文件的名字
-  mv app/build/outputs/apk/app-debug.apk app/build/outputs/apk/buff.apk
-
-deploy:              # 部署
+script:
+- "./gradlew assembleRelease"
+before_deploy: mv app/build/outputs/apk/app-debug.apk app/build/outputs/apk/buff.apk
+deploy:
   provider: releases
-  file: app/build/outputs/apk/Gank.apk   # 部署文件路径
-  skip_cleanup: true     # 设置为true以跳过清理,不然apk文件就会被清理
-  on:     # 发布时机
-    tags: true       # tags设置为true表示只有在有tag的情况下才部署
+  file: app/build/outputs/apk/Gank.apk
+  skip_cleanup: true
+  on:
+    tags: true
+before_install:
+- openssl aes-256-cbc -K $encrypted_9764c1140142_key -iv $encrypted_9764c1140142_iv
+  -in google-services.json.enc -out google-services.json -d

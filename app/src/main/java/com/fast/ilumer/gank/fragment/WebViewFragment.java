@@ -40,33 +40,36 @@ public class WebViewFragment extends BaseFragment{
         webView.setWebChromeClient(new WebChromeClient(){
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
-                if (newProgress == 100){
-                    progressBar.setVisibility(View.GONE);
-                }else {
-                    progressBar.setProgress(newProgress);
-                }
+                    if (newProgress == 100) {
+                        progressBar.setVisibility(View.GONE);
+                    } else {
+                        progressBar.setProgress(newProgress);
+                    }
             }
         });
-        webView.setWebViewClient(new WebViewClient(){
-            @Override
-            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-                super.onReceivedError(view, request, error);
-                Toast.makeText(getActivity(),"no error",Toast.LENGTH_SHORT).show();
-            }
-        });
+        webView.setWebViewClient(new WebViewClient());
         webView.getSettings().setJavaScriptEnabled(true);
         webView.loadUrl(uri);
-        //:TODO 添加progressbar
     }
 
     @Override
-    public void onDestroy() {
+    public void onPause() {
+        super.onPause();
+        webView.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        webView.onResume();
+    }
+
+    @Override
+    public void onDestroyView() {
         if (webView!=null){
             webView.destroy();
-            webView.destroy();
         }
-        super.onDestroy();
-
+        super.onDestroyView();
     }
 
     public static WebViewFragment newInstance(String Uri){
