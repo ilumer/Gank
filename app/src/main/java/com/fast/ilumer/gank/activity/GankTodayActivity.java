@@ -106,6 +106,7 @@ public class GankTodayActivity extends AppCompatActivity
         Observable<GankDaily> postData = returnData.filter(Funcs.not(Results.isNull()));
 
         returnData.filter(Results.isNull())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(gankTodayNotUpdate);
 
         subscription.add(postData
@@ -115,13 +116,10 @@ public class GankTodayActivity extends AppCompatActivity
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(GankTodaySuccess));
         //由于gank的每日的更新的item不确定所以对应的id更新的数据库的想法有一点的不合实际
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DatePickerDialogFragment fragment = DatePickerDialogFragment.Instance(day);
-                fragment.show(getSupportFragmentManager(),"DatePickerfragment");
-            }
-        });
+        fab.setOnClickListener((v -> {
+            DatePickerDialogFragment fragment = DatePickerDialogFragment.Instance(day);
+            fragment.show(getSupportFragmentManager(),"DatePickerfragment");
+        }));
         subject.onNext(day);
     }
 
@@ -194,6 +192,8 @@ public class GankTodayActivity extends AppCompatActivity
     private final Action1<GankDaily> gankTodayNotUpdate = new Action1<GankDaily>() {
         @Override
         public void call(GankDaily gankDaily) {
+            //check activity state http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html
+            //避免异步的时候调用
             TipDialogFragment HasGankFragment = TipDialogFragment.newInstance("今天暂时没有干货啦");
             HasGankFragment.show(getSupportFragmentManager(),"NO_GANK");
         }

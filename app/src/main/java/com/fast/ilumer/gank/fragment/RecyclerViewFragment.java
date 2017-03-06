@@ -43,6 +43,8 @@ public abstract class RecyclerViewFragment extends BaseFragment
     public static final String EXTRA_LIST = "RecyclerViewFragment.List";
     public static final String EXTRA_LAYOUTMANAGER_STATE = "RecyclerViewFragment.LayoutManagerState";
     public static final String EXTRA_PAGE = "RecyclerViewFragment.PAGE";
+    public final String TAG = this.getClass().getSimpleName();
+
     @BindView(R.id.content)
     RecyclerView mContent;
     @BindView(R.id.swipe_refresh)
