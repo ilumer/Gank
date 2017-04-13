@@ -28,6 +28,7 @@ import butterknife.BindView;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
@@ -114,12 +115,12 @@ public abstract class RecyclerViewFragment extends BaseFragment
                     }));
             onRefresh();
         }
+
     }
 
     public void loadMore(int page){
         subscription.add(getReslut(page)
                 .doOnSubscribe(mAdapter)
-                .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(mAdapter));
     }
@@ -183,45 +184,41 @@ public abstract class RecyclerViewFragment extends BaseFragment
     @Override
     public void onRefresh() {
         mSwipeRefreshLayout.setRefreshing(true);
-        subscription.add(getReslut(1)
-                .filter(list -> !mContentList.containsAll(list))
-                .doOnNext(list -> {
-                    getActivity()
-                            .getContentResolver()
-                            .delete(GankInfoContract.GankEntry.TYPE_CONTENT_URI,"_id > ? and type = ?",new String[]{"-1",type});
-                    for (GankInfo info:list){
-                        getActivity()
-                                .getContentResolver()
-                                .insert(GankInfoContract.GankEntry.TYPE_CONTENT_URI,new GankInfo.Builder(info).build());
-                    }
-                    updateMuzei();
-                    //等待数据库更新成功后再去获取最新的壁纸
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<GankInfo>>() {
-                    @Override
-                    public void onCompleted() {
-                        mSwipeRefreshLayout.setRefreshing(false);
-                    }
+        Observable<List<GankInfo>> data = getReslut(1)
+            .filter(list -> !mContentList.containsAll(list));
 
-                    @Override
-                    public void onError(Throwable e) {
-                        mSwipeRefreshLayout.setRefreshing(false);
-                    }
+        subscription.add(data.observeOn(Schedulers.io()).subscribe(list -> {
+            getActivity().getContentResolver()
+                .delete(GankInfoContract.GankEntry.TYPE_CONTENT_URI, "_id > ? and type = ?",
+                    new String[] { "-1", type });
+            for (GankInfo info : list) {
+                getActivity().getContentResolver()
+                    .insert(GankInfoContract.GankEntry.TYPE_CONTENT_URI,
+                        new GankInfo.Builder(info).build());
+            }
+            updateMuzei();
+        }));
+        subscription.add(data.observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Observer<List<GankInfo>>() {
+                @Override public void onCompleted() {
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
 
-                    @Override
-                    public void onNext(List<GankInfo> list) {
-                        if (mContentList.size() >= 10) {
-                            for (int i = 0; i < list.size(); i++) {
-                                mContentList.set(i, list.get(i));
-                            }
-                        } else {
-                            mContentList.addAll(list);
+                @Override public void onError(Throwable e) {
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
+
+                @Override public void onNext(List<GankInfo> list) {
+                    if (mContentList.size() >= 10) {
+                        for (int i = 0; i < list.size(); i++) {
+                            mContentList.set(i, list.get(i));
                         }
-                        mAdapter.notifyDataSetChanged();
+                    } else {
+                        mContentList.addAll(list);
                     }
-                }));
+                    mAdapter.notifyDataSetChanged();
+                }
+            }));
     }
 
     @Override
